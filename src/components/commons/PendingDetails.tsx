@@ -12,103 +12,69 @@ import {
 } from "@/components/ui/card"
 import axios from "axios";
 import { useToast } from "../ui/use-toast";
-import { Skeleton } from "@/components/ui/skeleton"
 import Loading from "@/app/loading";
+import { REFRESH_EVENT } from "./useRefreshEvent";
+import useFetch from "../hooks/useFetch";
+import Error from "./error";
 
-
-// const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
-// const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Act", "Nov", "Dec",]
-
-// function formatDateToLocal(date: Date): string {
-//     return days[date.getDay() - 1] + ", " + date.getDate() + " " + months[date.getMonth()] + " " + date.getFullYear();
-// }
 
 interface Props {
     setForDate: (state: Date) => void;
     forDate: Date
 }
 
-export default function PendingDetails({ setForDate, forDate }: Props) {
-    const [pendingDates, setPendingDates] = useState<string[]>([])
-    const fetchingData = useRef(true);
-
-    const { toast } = useToast();
-
-
-    function fetchPendingDays() {
-
-        axios.get<string[]>("http://localhost:8080/tradedetails/pendingDates")
-            .then(res => {
-                if (res.status === 200) {
-                    console.log(res.data);
-
-                    setPendingDates(res.data)
-
-                    toast({
-                        title: "Fetched pending dates",
-                    });
-                } else {
-                    toast({
-                        title: "Server Error",
-                        description: "Bad response recieved from server"
-                    });
-                }
-            }).catch(err => {
-                toast({
-                    title: "Network Error",
-                    description: err.toString()
-                })
-            })
-    }
+export default function PendingDays({ setForDate, forDate }: Props) {
+    const { data, refresh, loading, error } = useFetch<string[]>("http://localhost:8080/tradedetails/pendingDates");
 
     useEffect(() => {
-        fetchingData.current = true;
+        document.addEventListener(REFRESH_EVENT, () => { refresh() })
 
-        setTimeout(() => { fetchPendingDays() }, 2000)
-
-        fetchingData.current = false;
-
+        return () => document.removeEventListener(REFRESH_EVENT, () => { })
     }, [])
 
-
-    return <div className='flex-none w-full lg:flex-auto lg:w-[30%]'>
-        <div className="flex flex-row justify-between align-center my-2">
-            <h3 className="text-lg font-bold">Pending Details:</h3>
+    return <div className='grow flex flex-col w-full lg:flex-grow lg:w-[30%] bg-background border border-gray-100 px-2 rounded-md shadow-sm'>
+        <div className="flex-none flex flex-row justify-between align-center my-2">
+            <h3 className="text-lg font-bold">Pending Days:</h3>
         </div>
 
         <Separator />
 
         {
-            fetchingData.current
-                ? <>
-                    <Loading />
-                    <Loading />
-                    <Loading />
-                </>
+            loading
+                ? <Loading />
                 : <>
                     {
-                        pendingDates && pendingDates.length === 0
-                            ? <>
-                                <p className="my-2">No pending trades.</p>
-                            </>
-                            : <>
-                                {pendingDates.map((date, index) => {
+                        data && data.length === 0
+                            ? <div>
+                                <p className="my-2">No pending days.</p>
+                            </div>
+                            : <div className="grow overflow-y-auto max-h-[100%] mb-2">
+                                {data?.map((date, index) => {
                                     const dateString = new Date(date).toDateString()
 
-                                    return <Card className="mt-2 " key={index} >
+                                    return <Card className="my-2" key={index} >
                                         <CardHeader className={"flex flex-row justify-between align-center px-4 py-2 space-y-0 " + ((forDate.toDateString() === new Date(date).toDateString()) ? "bg-slate-100" : "")}>
                                             <p className="text-sm font-medium self-center">Date: {dateString} </p>
-                                            <Button className="w-fit text-sm m-0" size={"sm"} variant={"outline"} onClick={() => setForDate(new Date(date))}>Fill now</Button>
+                                            <Button className="w-fit text-sm m-0" size={"sm"} variant={"outline"} onClick={() => setForDate(new Date(addCurrentTimeToDateString(date)))}>Fill now</Button>
                                         </CardHeader>
                                     </Card>
                                 })}
-                            </>
+                            </div>
                     }
                 </>
 
+        }
+        {
+            !loading && error && <Error />
         }
 
 
 
     </div>
+}
+
+function addCurrentTimeToDateString(date: string): string {
+    const dateNow = new Date();
+
+    return date + "T" + dateNow.getHours() + ":" + dateNow.getMinutes() + ":" + dateNow.getMinutes();
 }

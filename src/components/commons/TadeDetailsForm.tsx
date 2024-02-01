@@ -21,7 +21,7 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import { useEffect, useRef, useState } from "react"
+import React, { ReactElement, useEffect, useRef, useState } from "react"
 
 function getCurrentDate(): string {
     return new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60 * 1000).toISOString().substring(0, 16)
@@ -32,21 +32,18 @@ function getDateInISOAsLocalDate(date: Date): string {
 }
 
 interface Props {
-    forDate: Date
+    forDate: Date;
+    onDataSubmit: () => void;
 }
 
-export default function TradeDetailsForm({ forDate }: Props) {
+export default function TradeDetailsForm({ forDate, onDataSubmit }: Props) {
 
-    const formState = useRef(null)
+    const formState = useRef<HTMLFormElement | null>(null)
     const { toast } = useToast()
-
-    const fetchingData = useRef(true)
-
+    const [fetchingData, setFetchingData] = useState(true)
     const [day, setDay] = useState<null | number>(null)
 
     const handleSubmit = (e: any) => {
-        console.log(formState);
-
         if (formState.current == null)
             return;
 
@@ -55,7 +52,9 @@ export default function TradeDetailsForm({ forDate }: Props) {
         const tradeDetails = {
             noTradingDay: false,
             isHoliday: false,
-            date: formData.get("dateTime"),
+            isWeekend: false,
+            dateTime: formData.get("dateTime"),
+            day: formData.get("day"),
             instrumentType: formData.get("instrumentType"),
             instrumentName: formData.get("instrumentName"),
             setupName: formData.get("setupName"),
@@ -80,29 +79,47 @@ export default function TradeDetailsForm({ forDate }: Props) {
             description: "Data is being sent to the server. Waiting for the response."
         })
 
-        //send to backend
-        // await axios.post("http://localhost:8080/tradedetails",
-        //     uploadObject,
-        //     {
-        //         headers: {
-        //             "Content-Type": "multipart/form-data",
+        // send to backend
+        axios.post("http://localhost:8080/tradedetails",
+            uploadObject,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                }
+            }
+        ).then(res => {
+            if (res.status.toString().startsWith("2")) {
+                toast({
+                    title: "Data saved",
+                    description: "Data is saved to the server."
+                })
 
-        //         }
-        //     }
-        // )
+            } else {
+                toast({
+                    title: "Data not stored",
+                    description: "Data is not saved to the server."
+                })
+            }
+            onDataSubmit();
+        }).catch((err: AxiosError) => {
+            toast({
+                title: "Error !",
+                description: "Error in sending the data." + err.message
+            })
+        });
 
+        (formState.current as HTMLFormElement).reset()
 
-
-        //display a toast
-
-        // e.preventDefault()
     }
 
+    const [imagePreviews, setImagePreviews] = useState<ReactElement[]>([])
+
     useEffect(() => {
-        fetchingData.current = true
+        setFetchingData(true)
 
         axios.get<{ days: number }>("http://localhost:8080/tradedetails/getMaxDaysTraded")
             .then(res => {
+
                 if (res.status === 200) {
 
                     setDay(res.data.days + 1)
@@ -117,12 +134,40 @@ export default function TradeDetailsForm({ forDate }: Props) {
                     title: "Network Issue",
                     description: "Message: " + err.message
                 })
-            });
+            }).finally(() => setFetchingData(false))
     }, [])
+
+    function handleOnImagePaste(e: any) {
+        let input = document.getElementById("images") as HTMLInputElement;
+
+        let fileList = new DataTransfer()
+
+        if (input.files?.length !== undefined) {
+            for (let i = 0; i < input.files?.length; i++) {
+                fileList.items.add(input.files[i])
+            }
+        }
+
+        fileList.items.add(e.clipboardData.files[0])
+
+        input.files = fileList.files;
+
+        let reader = new FileReader()
+        reader.readAsDataURL(e.clipboardData.files[0])
+
+        reader.onload = () => {
+            let image = React.createElement("img", {
+                "src": reader.result
+            })
+            setImagePreviews(prev => {
+                return [...prev, image]
+            })
+        }
+    }
 
     return <Dialog>
         <DialogTrigger asChild >
-            <div className="flex w-full justify-center m-3">
+            <div className="flex w-full justify-center p-2">
                 <Button className="justify-self-center w-fit " variant={"outline"}>+ Add new trade details</Button>
             </div>
         </DialogTrigger>
@@ -136,7 +181,7 @@ export default function TradeDetailsForm({ forDate }: Props) {
 
             <Separator />
 
-            <form ref={formState}>
+            <form ref={formState} onPaste={(e) => handleOnImagePaste(e)}>
                 <ScrollArea className="h-[500px]">
                     <div className="grid w-full max-w-sm items-center gap-4 p-2">
                         <Label aria-label="max-day" className="text-sm text-slate-500">Max days traded: {(day! - 1).toString()}</Label>
@@ -228,7 +273,9 @@ export default function TradeDetailsForm({ forDate }: Props) {
                             <Input id="images" name="images" type="file" multiple={true} accept="image/png, image/gif, image/jpeg" />
                         </div>
 
-
+                        <div className="label-distance" id="imagePreview">
+                            {imagePreviews}
+                        </div>
                     </div>
 
                 </ScrollArea>

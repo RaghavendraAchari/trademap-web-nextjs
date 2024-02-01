@@ -8,8 +8,9 @@ export default interface Trade {
     instrumentName: string;
     setupName: string;
     remarks: string;
-    riskToReward: Number;
-    riskToRewardOnPremium: Number;
-    pnl: Number;
-    imagePaths: Array<String>;
+    riskToReward: number;
+    riskToRewardOnPremium: number;
+    pnl: number;
+    isWeekend: boolean;
+    imagePaths: Array<string>;
 }

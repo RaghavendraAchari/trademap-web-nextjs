@@ -14,8 +14,8 @@ export default function DisplayDate() {
     }, [])
 
     return (
-        <>
-            <h3 suppressHydrationWarning className='text-sm lg:text-md pt-2'>Date and Time: {time}</h3>
-        </>
+        <div>
+            <h3 suppressHydrationWarning className='desc'>Date and Time: {time}</h3>
+        </div>
     );
 }

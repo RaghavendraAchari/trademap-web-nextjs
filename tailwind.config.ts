@@ -30,6 +30,11 @@ const config: Config = {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
         },
+        main: {
+          DEFAULT: "var(--primary-color)",
+          fade: "var(--primary-color-fade)",
+          extrafade: "var(--primary-color-extrafade)",
+        },
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
           foreground: "hsl(var(--secondary-foreground))",
@@ -53,7 +58,10 @@ const config: Config = {
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
+          header: "#f0e8ff",
+          footer: "#f2eff6"
         },
+
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -69,10 +77,15 @@ const config: Config = {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
+        "spin": {
+          from: { transform: "rotate(0deg)" },
+          to: { transform: "rotate(360deg)" }
+        }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        "spin": "spin 1s ease-in-out"
       },
     },
   },

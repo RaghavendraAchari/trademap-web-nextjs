@@ -1,0 +1,49 @@
+{
+    "tradedetails": [
+        {
+            "id": 1,
+            "day": 2,
+            "dateTime": "2023-12-19T13:30",
+            "noTradingDay": false,
+            "isHoliday": false,
+            "instrumentType": "INDEX",
+            "instrumentName": "Nifty",
+            "setupName": "5 EMA",
+            "remarks": "Desc of trade",
+            "riskToReward": 1.5,
+            "riskToRewardOnPremium": 1,
+            "pnl": 300,
+            "imagePaths": [
+                "path 1",
+                "path 2"
+            ]
+        }
+    ],
+    "pendingDates": [
+        "2023-12-25",
+        "2023-12-26"
+    ],
+    "maxDaysTraded": {
+        "days": 3
+    },
+    "today": [
+        {
+            "id": 1,
+            "day": 2,
+            "dateTime": "2023-12-19T13:30",
+            "noTradingDay": false,
+            "isHoliday": false,
+            "instrumentType": "INDEX",
+            "instrumentName": "Nifty",
+            "setupName": "5 EMA",
+            "remarks": "Desc of trade",
+            "riskToReward": 1.5,
+            "riskToRewardOnPremium": 1,
+            "pnl": 300,
+            "imagePaths": [
+                "path 1",
+                "path 2"
+            ]
+        }
+    ]
+}
