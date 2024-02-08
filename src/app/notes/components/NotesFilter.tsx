@@ -1,7 +1,11 @@
+import { cn } from "@/lib/utils";
 
-export default function NotesFilter() {
-    return <div className="h-full max-h-full w-full overflow-auto rounded-sm border p-2 text-sm font-bold bg-background">
-        <h5 className="border-b">Filter:</h5>
+interface Props extends React.HTMLAttributes<HTMLDivElement> {
+
+}
+
+export default function NotesFilter({ className, ...props }: Props) {
+    return <div className={cn("h-full max-h-full w-full overflow-auto rounded-sm border p-2 text-sm font-bold bg-background", className)}>
         <h6 className="mt-2 text-xs opacity-60">Categories:</h6>
         <div className="selected my-1 flex flex-wrap justify-start gap-1 rounded-md bg-slate-50 p-2 font-mono text-xs">
             <span className="rounded-full border bg-white p-1 px-2 text-xs">New</span>
@@ -29,7 +33,7 @@ export default function NotesFilter() {
             <span className="cursor-pointer rounded-full border border-slate-200 bg-white px-2 py-1 font-mono text-xs opacity-80 shadow-sm hover:opacity-100 hover:shadow-md">#Hot</span>
             <span className="cursor-pointer rounded-full border border-slate-200 bg-white px-2 py-1 font-mono text-xs opacity-80 shadow-sm hover:opacity-100 hover:shadow-md">#Hot</span>
         </div>
-        <h5 className="mt-2 border-b">Search by keyword:</h5>
+        <h5 className="mt-2 border-b opacity-60">Search by keyword:</h5>
         <div className="selected my-1 flex w-full max-w-full flex-wrap justify-start gap-1 rounded-md bg-slate-50 p-2 font-mono text-xs">
             <div className="flex min-w-full items-center justify-between">
                 <input className="mr-2 min-w-10 grow rounded-md border p-2" placeholder="keywords" type="text" name="keyword" id="keyword" />

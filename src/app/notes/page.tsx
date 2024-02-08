@@ -1,16 +1,28 @@
 'use client';
 
 import NoteWithTimeline from "@/components/commons/NoteCardWithTimeline";
-import PageHeader from "@/components/commons/PageHeader";
 import Note from "@/models/Note";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import NotesFilter from "./components/NotesFilter";
 import EditNote from "./components/EditNote";
-import { getNotes } from "./notesService";
 import Loading from "../loading";
+import { SortByDate } from "@/components/commons/SortByDate";
+import { SORT } from "@/constants/SortType";
+import useFetch from "@/components/hooks/useFetch";
+import backendUrls from "@/constants/backendUrls";
 
+import {
+    Drawer,
+    DrawerClose,
+    DrawerContent,
+    DrawerDescription,
+    DrawerFooter,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerTrigger,
+} from "@/components/ui/drawer"
+import { Button } from "@/components/ui/button";
 
-type SORT = "ASC" | "DESC";
 
 interface Filters {
     tags: Array<string>,
@@ -19,10 +31,9 @@ interface Filters {
 }
 
 export default function AllTrades() {
-    const [notes, setNotes] = useState<Array<Note>>([]);
-    const [fetchingData, setFechingData] = useState(true);
+    const { data: notes, error, loading, refresh } = useFetch<Note[]>(backendUrls.notes.allNotes)
 
-    const [filters, setFilters] = useState<Filters>({
+    const [selectedFilters, setselectedFilters] = useState<Filters>({
         tags: [],
         categories: [],
         keyWords: [],
@@ -30,19 +41,7 @@ export default function AllTrades() {
 
     const [sort, setSort] = useState<SORT>("DESC");
 
-    const fetchNotes = async (filters: Filters, sort: SORT) => {
-        setFechingData(true);
-        const data = await getNotes();
-        setFechingData(false);
-
-        setNotes(data);
-    }
-
     const [editNote, setEditNoteContent] = useState<Note | null>({} as Note);
-
-    useEffect(() => {
-        fetchNotes(filters, sort)
-    }, [])
 
     let notesList = null;
     if (notes && notes.length > 0) {
@@ -51,46 +50,53 @@ export default function AllTrades() {
         })
     }
 
-    const onNewNoteSave = () => {
-        fetchNotes(filters, sort)
+    const onNewNoteSave = async () => {
+        await refresh()
     }
 
-    const data = fetchingData
-        ? <div className="w-full h-full bg-background flex flex-col p-2"><Loading /></div>
-        : <><SortComponent sort={sort} setSort={setSort} key={"sort"} />
-            <div className="my-1">
-                {notesList}
-                {editNote ? <EditNote note={editNote} key={"editNote"} onSave={onNewNoteSave} /> : null}
+    return <div className='md:flex md:flex-row md:grow md:h-full md:max-h-full md:divide-x overflow-y-visible md:overflow-y-auto' >
+        <div className="w-full px-3 py-2 bg-transparent md:flex md:flex-col  divide-y md:w-[70%] md:h-full md:max-h-full ">
+            <div className="flex-none  bg-background text-foreground flex justify-between z-20 ">
+                <h3 className="font-bold py-1">Notes:</h3>
+                <SortByDate sort={sort} setSort={setSort} />
             </div>
-        </>
+            {
+                loading && notes == null && error === null
+                    ? <div className="w-full h-full bg-background flex flex-col p-2"><Loading /></div>
+                    : <div className="my-2 grow md:max-h-full md:overflow-y-auto">
+                        {notesList}
+                        {editNote ? <EditNote note={editNote} key={"editNote"} onSave={onNewNoteSave} /> : null}
+                    </div>
+            }
+        </div>
 
-    return (
-        <div className='page'>
-            <PageHeader title="Personal Notes" description="All the things that you want to remember in your trading journey." />
-
-            <div className='grow overflow-y-auto flex flex-row pt-2 m-2 bg-slate-100 ' >
-                <div className="w-[70%] px-2 rounded-sm bg-transparent backdrop-blur-lg">
-                    {data}
-                </div>
-                <div className="grow overflow-auto max-h-full w-[30%] mx-auto px-2 sticky top-0">
-                    <NotesFilter />
-                </div>
+        <div className="hidden md:flex grow md:flex-col md:overflow-y-auto max-h-full md:w-[30%] mx-auto px-2 py-2 divide-y">
+            <div className="flex-none bg-background text-foreground flex justify-between z-20 py-2">
+                <h3 className="font-bold">Filters:</h3>
+            </div>
+            <div className="grow max-h-full overflow-y-auto">
+                <NotesFilter className="grow max-h-full border-0" />
             </div>
         </div>
-    )
-}
 
-interface SortProps {
-    sort: SORT;
-    setSort: (fn: (prev: SORT) => SORT) => void;
-}
+        <div className="block md:hidden sticky bottom-0 bg-background">
+            <Drawer >
+                <DrawerTrigger className="p-2 font-semibold border w-full text-start">Filters: </DrawerTrigger>
+                <DrawerContent>
+                    <DrawerHeader>
+                        <DrawerTitle>Filters</DrawerTitle>
+                        <DrawerDescription>Filter based on tags, categories and search keywords</DrawerDescription>
+                    </DrawerHeader>
+                    <NotesFilter className="border-0" />
+                    <DrawerFooter>
+                        <Button>Apply</Button>
+                        <DrawerClose>
+                            <Button variant="outline">Cancel</Button>
+                        </DrawerClose>
+                    </DrawerFooter>
+                </DrawerContent>
+            </Drawer>
+        </div>
 
-function SortComponent({ sort, setSort }: SortProps) {
-    return <div className="flex flex-row justify-end rounded-sm shadow-md py-1 mb-1 border border-slate-300 bg-background items-center sticky top-0 z-20">
-        <span className="text-xs font-semibold px-2 pr-8" >Sort by date :{" "}
-            <button className="w-8" onClick={() => { setSort((prev: SORT) => prev === "ASC" ? "DESC" : "ASC") }}>
-                {sort === "ASC" ? "DESC" : "ASC"}
-            </button>
-        </span>
     </div>
 }

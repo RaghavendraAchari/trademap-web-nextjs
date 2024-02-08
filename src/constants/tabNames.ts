@@ -6,7 +6,7 @@ interface TabDetails {
 const tabs = [
     {
         url: "/",
-        tabName: "Dashboard"
+        tabName: "Dashboard",
     },
     {
         url: "/allTrades",

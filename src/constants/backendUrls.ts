@@ -1,10 +1,13 @@
 const baseUrl = "http://localhost:8080"
 
 const allTrades = baseUrl + "/tradedetails"
-const pendingDays = allTrades + "pendingDates"
+const pendingDays = allTrades + "/pendingDates"
 
 const allNotes = baseUrl + "/notes"
 const categoriesAndTags = allNotes + "/categoriesAndTags"
+
+const allInsights = baseUrl + "/insights"
+const allInsightsWithTitlesOny = baseUrl + "/insights/onlyTitles"
 
 
 
@@ -18,6 +21,10 @@ export default {
     notes: {
         allNotes,
         categoriesAndTags
+    },
+    insights: {
+        allInsights,
+        allInsightsWithTitlesOny
     }
 }
 

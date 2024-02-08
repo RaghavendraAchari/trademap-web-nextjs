@@ -81,27 +81,6 @@
 }
 
 
-.page{
-  @apply container h-full max-h-full mt-16 md:mt-0 md:px-0 md:mx-0 p-2 flex flex-col bg-main-extrafade text-foreground;
-}
-
-.page .page-header{
-  @apply flex-none bg-background p-3 m-2 rounded-lg shadow-sm border border-gray-100 ;
-}
-
-.page .page-header .title{
-  @apply text-3xl font-extrabold opacity-80;
-}
-
-.page .page-header .desc{
-  @apply font-medium pt-2;
-}
-
-
-.page .content{
-  @apply md:grow md:overflow-y-auto flex flex-col lg:flex-row pt-0 space-y-4 lg:space-y-0 lg:space-x-2 m-2;
-}
-
 .note:first-child .timeline{
   @apply rounded-t-full;
 }
@@ -132,4 +111,40 @@
   }
 }
 
+.ce-toolbar__actions{
+  @apply md:left-[0%] lg:-left-[0%] xl:-left-[4%] 2xl:-left-[15%]; 
+  
+}
+.ce-toolbar{
+  @apply md:w-full h-10;
+}
+.ce-toolbar__content{
+  @apply md:w-full bg-red-300 ml-1;
+}
+.ce-toolbar__actions{
+  @apply md:left-0;
+}
+.ce-block__content{
+  @apply md:mx-16;
+}
+
+/* width */
+::-webkit-scrollbar {
+  @apply md:w-2;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  @apply md:bg-[#fff];
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  @apply md:bg-[#d6d4d4] md:rounded-[5px];
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  @apply md:bg-[#d6d4d4];
+}
 

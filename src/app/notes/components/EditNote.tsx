@@ -1,5 +1,5 @@
 "use client"
-import useCurrentDate from "@/components/commons/useCurrentTime";
+import useCurrentDate from "@/components/hooks/useCurrentTime";
 import { Button } from "@/components/ui/button";
 import Note from "@/models/Note";
 import { postNote } from "@/app/notes/notesService"
@@ -68,7 +68,7 @@ export default function EditNote({ note, onSave }: Props) {
 
     }
 
-    return <div className="note mx-auto flex min-h-64 flex-row bg-slate-50 p-2 py-0 min-w-full backdrop-blur-lg ">
+    return <div className="note mx-auto flex min-h-64 flex-row bg-slate-50 p-2 py-0 min-w-full backdrop-blur-lg text-xs md:text-sm">
         <div className="timeline min-h-full w-4 border border-gray-200 bg-primary shadow-md"></div>
 
         <div className="connector z-10 -ml-4 flex min-h-full w-20 items-center">
@@ -81,7 +81,7 @@ export default function EditNote({ note, onSave }: Props) {
             <div className="card z-9 -ml-6 flex min-h-full w-full flex-col self-center rounded-lg bg-white p-2 pl-8 text-justify text-base font-medium shadow border ">
                 <div className="dateTime"><p className="text-xs text-end opacity-80">{getFullDateTimeWithMinutes(date)}</p></div>
 
-                <div className="header flex items-start justify-between gap-1 rounded-tl-md rounded-tr-md bg-slate-100 px-2 py-2">
+                <div className="header flex flex-col md:flex-row items-start justify-between gap-1 rounded-tl-md rounded-tr-md bg-slate-100 px-2 py-2">
                     <Input name="title" value={title} className="grow text-wrap h-8" placeholder="Add title" onChange={(e) => setTitle(e.target.value)} />
 
                     <div className="flex-none flex items-center justify-start self-start  space-x-1">
@@ -99,7 +99,7 @@ export default function EditNote({ note, onSave }: Props) {
 
                 </Textarea>
 
-                <div className="footer flex min-h-10 w-full items-start justify-between gap-1 rounded-bl-md rounded-br-md bg-slate-200 px-2 py-2">
+                <div className="footer flex flex-col md:flex-row min-h-10 w-full items-start justify-between gap-1 rounded-bl-md rounded-br-md bg-slate-200 px-2 py-2">
                     <Input name="footer" value={footer} onChange={e => setFooter(e.target.value)} className="grow text-wrap h-8" placeholder="Add footer (optional)" />
                     <div className="flex-none flex items-center justify-start self-start  space-x-1">
                         <Categories categories={categories} addNewCategories={addNewCategory} removeCategories={removeCategory} setCategories={setCategories} />

@@ -30,13 +30,13 @@ export default function NoteWithTimeline({ note }: Props) {
             <div className="card border z-9 -ml-6 flex min-h-full w-full flex-col self-center rounded-lg bg-white p-2 pl-8 text-justify text-sm font-bold shadow whitespace-pre capitalize">
                 <div className="dateTime"><p className="text-end opacity-[75%] font-mono">{getFullDateTime(new Date(note.dateTime))}</p></div>
                 <div className="header flex min-h-10 w-full items-center justify-between gap-1 rounded-tl-md rounded-tr-md bg-slate-100 px-2">
-                    <h5 className="grow text-wrap py-2">{note.title}</h5>
+                    <h5 className="grow text-wrap py-2 capitalize">{note.title}</h5>
                     <div className="flex-none self-start py-2">
                         {tags}
                     </div>
                 </div>
 
-                <div className="body grow px-2 text-sm font-medium min-h-[6em]">{note.content}</div>
+                <div className="body grow px-2 text-sm font-medium min-h-[6em] capitalize">{note.content}</div>
 
                 <div className="footer flex min-h-10 w-full items-center justify-between gap-1 rounded-bl-md rounded-br-md bg-slate-200 px-2 py-2">
                     <h5 className="grow text-wrap opacity-80">{note.desciption}</h5>

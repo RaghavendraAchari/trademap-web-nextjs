@@ -6,7 +6,11 @@ export default function useFetch<T>(url: string) {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null)
 
-    const refresh = () => { fetchData(url) }
+    const refresh = async () => {
+        console.log("refreshing data");
+
+        await fetchData(url)
+    }
 
     async function fetchData(url: string) {
         setLoading(true)
