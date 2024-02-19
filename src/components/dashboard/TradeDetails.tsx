@@ -3,7 +3,7 @@
 import { Separator } from "@/components/ui/separator";
 import TradeDetailsForm from "../tradeDetails/TadeDetailsForm";
 import { Badge } from "@/components/ui/badge"
-import Trade from "@/models/Trade";
+import Trade from "@/models/trade/Trade";
 import Loading from "@/app/loading";
 import NoTradingDayForm from "../tradeDetails/NoTradingDayForm";
 import TradeDetailsList from "../tradeDetails/TradeDetailsList";
@@ -74,19 +74,23 @@ function TotalPnL({ trades }: { trades: Trade[] }) {
     if (trades && trades.length > 0 && (trades[0].isHoliday || trades[0].noTradingDay || trades[0].isWeekend))
         return null;
 
-
     if (trades?.length === 0)
         return null;
 
     let total = trades?.reduce((prev, current: Trade) => prev + current.pnl, 0);
-    return <span className="text-xs md:text-sm font-semibold my-auto flex justify-end items-center space-x-1"><span>Total P&L :</span> <Badge className={"mr-2 " + (total !== undefined && total < 0) ? "bg-red-400 hover:bg-red-400" : "bg-green-400 hover:bg-green-400"} variant="default">{total}</Badge></span>
+    return <span className="text-xs md:text-sm font-semibold my-auto flex justify-end items-center space-x-1">
+        <span>Total P&L :</span>
+        <Badge className={"mr-2 " + (total < 0 ? " bg-red-400 hover:bg-red-400" : " bg-green-400 hover:bg-green-400")} variant="default">
+            {total}
+        </Badge>
+    </span>
 }
 
 function DisplayTrades({ trades, forDate, onDataSubmit }: { trades: Trade[], forDate: Date, onDataSubmit: () => void }) {
     if (trades[0].isHoliday === true || trades[0].noTradingDay == true || trades[0].isWeekend == true)
         return <NoTradeDay trade={trades[0]} />
     else return <>
-        <TradeDetailsList tradesList={trades} showFullDate={false} />
+        <TradeDetailsList tradesList={trades} showFullDate={false} showOptions={true} />
         <TradeDetailsForm forDate={forDate} onDataSubmit={onDataSubmit} />
     </>
 }
@@ -100,17 +104,24 @@ function NoTradesBanner() {
 
 function NoTradeDay({ trade }: { trade: Trade }) {
     let title;
+    let imgSrc;
 
-    if (trade.isHoliday)
+    if (trade.isHoliday) {
         title = "You marked it as a holiday."
-    else if (trade.noTradingDay)
+        imgSrc = "/holiday.svg"
+    }
+    else if (trade.noTradingDay) {
         title = "You marked it as No Trading Day"
-    else if (trade.isWeekend)
+        imgSrc = "/No Trading Day.svg"
+    }
+    else if (trade.isWeekend) {
         title = "You marked it as weekend."
+        imgSrc = "/weekend.svg"
+    }
 
 
     return <div className="flex flex-col justify-center">
-        <img src="/No Trading Day.svg" alt="svg" className="object-contain w-72 h-64 mx-auto my-5 opacity-70" />
+        <img src={imgSrc} alt="svg" className="object-contain w-72 h-64 mx-auto my-5 opacity-70" />
         <p className="text-center font-medium text-md mt-2">{title}</p>
     </div>
 }

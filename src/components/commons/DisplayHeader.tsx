@@ -1,6 +1,6 @@
 "use client"
 import { usePathname, useRouter } from "next/navigation"
-import useCurrentDate from "../hooks/useCurrentTime"
+import useCurrentDate from "../../hooks/useCurrentTime"
 import PageHeader from "./PageHeader"
 import { HTMLAttributes } from "react"
 import { cn } from "@/lib/utils"
@@ -12,6 +12,7 @@ interface Props extends HTMLAttributes<HTMLDivElement> {
 export default function DisplayHeader({ className, ...props }: Props) {
     const { dateAsString } = useCurrentDate()
     const pathname = usePathname()
+
     let title = null;
     let description = null;
 
@@ -20,17 +21,21 @@ export default function DisplayHeader({ className, ...props }: Props) {
             title = 'Dashboard'
             description = "Date and Time: " + dateAsString
             break
-        case "/allTrades":
+        case "/allTrades/":
             title = 'All Trades'
             description = "All the trades that you have taken till now."
             break
-        case "/notes":
+        case "/notes/":
             title = 'Personal Notes'
             description = "All the things that you want to remember in your trading journey."
             break
-        case "/insights":
+        case "/insights/":
             title = 'Insights'
             description = "Includes all the learning and observations from the trade history."
+            break;
+        case "/test/":
+            title = 'Test'
+            description = "Test app components here."
             break;
         default:
             title = 'Dashboard'

@@ -29,26 +29,33 @@ export default function Editor({ id, data, setData, edit = false, className }: P
     useEffect(() => {
         console.log("useEffectCalled with edit: " + edit);
 
+        if (ref.current && ref.current.destroy) {
+            console.log("Destroying old editor");
+            ref.current.destroy();
+        }
+
         //initialize editor if we don't have a reference
         const editor = new EditorJS({
             holder: id,
             tools: EDITOR_JS_TOOLS,
-            data,
+            data: data,
             readOnly: !edit,
         });
         ref.current = editor;
 
         //add a return function handle cleanup
         return () => {
+            console.log("Destroying editor on unmount");
+
             if (ref.current && ref.current.destroy) {
                 ref.current.destroy();
             }
         };
-    }, [edit]);
+    }, [edit, data]);
 
-    return <div className="flex flex-col items-end min-w-full">
-        <div className={cn("prose max-w-full w-full border mt-1 rounded mb-1", className)} id={id} />
-        <Button variant={"default"} size={"default"} onClick={handleOnSave} >Save</Button>
+    return <div className={cn("grow flex flex-col justify-start items-end min-w-full", className)}>
+        <div className="prose max-w-full w-full mt-1 mb-1" id={id} />
+        {edit === true && <Button variant={"default"} size={"default"} onClick={handleOnSave} >Save</Button>}
     </div>
 
 }

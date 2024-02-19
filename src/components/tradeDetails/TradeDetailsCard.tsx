@@ -1,22 +1,33 @@
-import Trade from "@/models/Trade"
+import Trade from "@/models/trade/Trade"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card"
 import { getFullDateTime, getTimeIn12HrFormat } from "@/lib/dateUtils";
 import { Label } from "../ui/label";
-import { ArrowDown, ArrowUp, Loader2 } from "lucide-react";
+import { ArrowBigUpDashIcon, ArrowDown, ArrowUp, ChevronsDownIcon, ChevronsUp, ChevronsUpIcon, Edit2, IndianRupeeIcon, Loader2, Menu, MoreVertical, Trash2 } from "lucide-react";
 import { useState } from "react";
-import Image from "next/image";
 import backendUrls from "@/constants/backendUrls";
 import { Button } from "../ui/button";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+import { TradeImagesList } from "./TradeImages";
+import TradeImageList from "@/app/test/components/tradeImageList";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+
 
 interface Props {
     trade: Trade,
-    showFullDate: boolean
+    showFullDate: boolean,
+    showOptions?: boolean
 }
 
 const footerCardStyle = "p-0 md:p-2 md:px-4 border rounded-xl ";
 
-export default function TradeDetailsCard({ trade, showFullDate }: Props) {
+export default function TradeDetailsCard({ trade, showFullDate, showOptions = false }: Props) {
     const [showImages, setShowImages] = useState(false);
 
     if (trade.isHoliday || trade.noTradingDay || trade.isWeekend) {
@@ -44,10 +55,22 @@ export default function TradeDetailsCard({ trade, showFullDate }: Props) {
             <InstrumentTypeLogo trade={trade} />
             <CardTitle className="flex flex-row justify-between items-center grow">
                 <span className="text-sm md:text-lg">{"Trade No: " + trade.id} ({trade.setupName})</span>
-                <span className="text-xs md:text-sm text-slate-500">{showFullDate ? getFullDateTime(new Date(trade.dateTime)) : getTimeIn12HrFormat(new Date(trade.dateTime))}</span>
+                <div className="flex flex-row items-center space-x-1">
+                    <span className="text-xs md:text-sm text-slate-500">{showFullDate ? getFullDateTime(new Date(trade.dateTime)) : getTimeIn12HrFormat(new Date(trade.dateTime))}</span>
+                    {showOptions && <div>
+                        <DropdownMenu >
+                            <DropdownMenuTrigger asChild className="cursor-pointer ml-1 "><Button size={"icon"} variant={"ghost"}><MoreVertical size={16} /></Button></DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="text-xs">
+                                <DropdownMenuItem className="space-x-1 cursor-pointer text-sm" ><Edit2 size={16} /><span>Edit</span></DropdownMenuItem>
+                                <DropdownMenuItem className="space-x-1 cursor-pointer text-sm"><Trash2 size={16} /><span>Delete</span></DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </div>}
+
+                </div>
             </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2 space-x-1 min-h-full flex flex-row justify-between overflow-y-auto">
+        <CardContent className="space-y-2 space-x-1 min-h-full flex flex-row justify-between overflow-y-auto bg-slate-50">
             <div className="w-10 h-10 flex-none"></div>
             <div className="grow space-y-2">
                 <div className="text-sm text-slate-700 py-2 whitespace-pre-wrap">{trade.remarks}</div>
@@ -56,7 +79,8 @@ export default function TradeDetailsCard({ trade, showFullDate }: Props) {
                     <span>{"->"}</span>
                     <span className="bg-green-200 p-1 rounded-sm">{trade.instrumentName}</span>
                 </div>
-                <div className="flex flex-row justify-end">
+                <div className="flex flex-row justify-between">
+                    <p className="text-xs text-slate-600 font-semibold self-center justify-center">{trade.imagePaths.length.toString() + " image(s)"}</p>
                     <Button size={"sm"} variant={"outline"} className="cursor-pointer flex flex-row justify-end  space-x-1 items-center  select-none py-0 px-4" onClick={() => setShowImages(prev => !prev)}>
                         {
                             !showImages ?
@@ -70,7 +94,7 @@ export default function TradeDetailsCard({ trade, showFullDate }: Props) {
                 </div>
                 {
                     showImages && <div className="images">
-                        <TradeImagesList trade={trade} />
+                        <TradeImageList trade={trade} />
                     </div>
                 }
             </div>
@@ -79,23 +103,12 @@ export default function TradeDetailsCard({ trade, showFullDate }: Props) {
             <div className="w-10"></div>
 
             <div className="flex flex-col space-y-1 md:space-y-0 md:flex-row justify-between w-full text-center">
-                <div className={footerCardStyle}>
-                    <Label className="text-xs md:text-sm">RR on index chart
-                        <p>{trade.riskToReward.toString()}</p>
-                    </Label>
-                </div>
+                <Button className="space-x-1" variant={"outline"}><ArrowBigUpDashIcon /><span>RR on index chart : </span><span>{trade.riskToReward.toString()}</span></Button>
                 {
-                    trade.instrumentType === "INDEX" ? <div className={footerCardStyle}>
-                        <Label className="text-xs md:text-sm">RR on FnO chart
-                            <p>{trade.riskToRewardOnPremium.toString()}</p>
-                        </Label>
-                    </div> : null
+                    trade.instrumentType === "INDEX" ? <Button className="space-x-1" variant={"outline"}><ArrowBigUpDashIcon /><span>RR on FnO chart : </span><span>{trade.riskToRewardOnPremium.toString()}</span></Button>
+                        : null
                 }
-                <div className={footerCardStyle}>
-                    <Label className="text-xs md:text-sm">P&L
-                        <p>{trade.pnl.toString()}</p>
-                    </Label>
-                </div>
+                <Button className="space-x-1" variant={"outline"}><IndianRupeeIcon size={16} /><span>P&L : </span><span>{trade.pnl.toString()}</span> <span>{trade.pnl > 0 ? <ChevronsUpIcon className="text-green-600" /> : <ChevronsDownIcon className="text-red-600" />} </span></Button>
             </div>
         </CardFooter>
     </Card>
@@ -124,23 +137,7 @@ export function InstrumentTypeLogo({ trade }: { trade: Trade }) {
     </Avatar>
 }
 
-export function TradeImagesList({ trade }: { trade: Trade }) {
 
-    return trade.imagePaths.map((path) => {
-        return <ImageWithLoader path={path} key={path} />
-    })
-}
 
-function ImageWithLoader({ path }: { path: string }) {
-    const [loading, setLoading] = useState(true);
 
-    return <div className="flex items-center justify-center">
-        <Loader2 className={"w-4 h-4 spin " + (loading ? "block" : "hidden")} />
-        <img onLoad={() => {
-
-            setLoading(false)
-        }} className={"w-full object-contain " + (!loading ? "block" : "hidden")} src={backendUrls.tradeDetails.getImageDownloadablePath(path)} alt="path" />
-    </div>
-
-}
 

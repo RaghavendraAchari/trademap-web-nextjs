@@ -2,7 +2,6 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Textarea } from "@/components/ui/textarea"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
@@ -21,11 +20,13 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import React, { ReactElement, useEffect, useRef, useState } from "react"
+import React, { ChangeEvent, FormEvent, ReactElement, useEffect, useRef, useState } from "react"
+import useFetch from "../../hooks/useFetch"
+import SetupsAndInstruments from "@/models/trade/SetupsAndInstruments"
+import backendUrls from "@/constants/backendUrls"
 
-function getCurrentDate(): string {
-    return new Date(new Date().getTime() - new Date().getTimezoneOffset() * 60 * 1000).toISOString().substring(0, 16)
-}
+import { ScrollArea } from "@/components/ui/scroll-area"
+
 
 function getDateInISOAsLocalDate(date: Date): string {
     return new Date(date.getTime() - date.getTimezoneOffset() * 60 * 1000).toISOString().substring(0, 16)
@@ -38,15 +39,37 @@ interface Props {
 
 export default function TradeDetailsForm({ forDate, onDataSubmit }: Props) {
 
+    const { data: setupsAndInstruments, error, loading, refresh } = useFetch<SetupsAndInstruments>(backendUrls.tradeDetails.setupsAndInstuments);
+
+    const [formOpen, setFormOpen] = useState<boolean>(false)
+    const [sendingForm, setSendingForm] = useState<boolean>(false)
+
     const formState = useRef<HTMLFormElement | null>(null)
     const { toast } = useToast()
     const [fetchingData, setFetchingData] = useState(true)
     const [day, setDay] = useState<null | number>(null)
 
-    const handleSubmit = (e: any) => {
+    const [formValues, setFormValues] = useState({
+        "day": "",
+        "dateTime": "",
+        "instrumentType": ""
+    })
+
+    const handleFormValueChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const name = event.target.name;
+        const value = event.target.value;
+        setFormValues(values => ({ ...values, [name]: value }))
+    }
+
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault()
+        console.log("onSubmit called");
+
+
         if (formState.current == null)
             return;
 
+        setSendingForm(true)
         const formData = new FormData(formState.current);
 
         const tradeDetails = {
@@ -101,14 +124,17 @@ export default function TradeDetailsForm({ forDate, onDataSubmit }: Props) {
                 })
             }
             onDataSubmit();
+            setFormOpen(false);
         }).catch((err: AxiosError) => {
             toast({
                 title: "Error !",
                 description: "Error in sending the data." + err.message
             })
-        });
+        }).finally(() => {
+            setSendingForm(false);
+            (formState.current as HTMLFormElement).reset()
+        })
 
-        (formState.current as HTMLFormElement).reset()
 
     }
 
@@ -135,13 +161,18 @@ export default function TradeDetailsForm({ forDate, onDataSubmit }: Props) {
                     description: "Message: " + err.message
                 })
             }).finally(() => setFetchingData(false))
+
+
     }, [])
 
-    function handleOnImagePaste(e: any) {
-        let input = document.getElementById("images") as HTMLInputElement;
+    function handleOnImagePaste(e: React.ClipboardEvent<HTMLFormElement>) {
+        if (e.clipboardData.files.length === 0)
+            return;
+        let input = inputImagesRef.current as HTMLInputElement;
 
         let fileList = new DataTransfer()
 
+        //if files are present already
         if (input.files?.length !== undefined) {
             for (let i = 0; i < input.files?.length; i++) {
                 fileList.items.add(input.files[i])
@@ -151,26 +182,42 @@ export default function TradeDetailsForm({ forDate, onDataSubmit }: Props) {
         fileList.items.add(e.clipboardData.files[0])
 
         input.files = fileList.files;
-
-        let reader = new FileReader()
-        reader.readAsDataURL(e.clipboardData.files[0])
-
-        reader.onload = () => {
-            let image = React.createElement("img", {
-                "src": reader.result
-            })
-            setImagePreviews(prev => {
-                return [...prev, image]
-            })
-        }
+        // input.dispatchEvent(new Event("input", { bubbles: true }));
+        setImagePreview()
     }
 
-    return <Dialog>
-        <DialogTrigger asChild >
-            <div className="flex w-full justify-center p-2">
+    const inputImagesRef = useRef<HTMLInputElement>(null);
+
+    function setImagePreview() {
+        let previews: ReactElement[] = [];
+
+        if (inputImagesRef.current && inputImagesRef.current.files?.length) {
+            for (let i = 0; i < inputImagesRef.current.files?.length; i++) {
+                console.log("reading image " + i);
+
+                let reader = new FileReader()
+                reader.readAsDataURL(inputImagesRef.current.files[i])
+
+                reader.onload = () => {
+                    const image = React.createElement("img", {
+                        src: reader.result,
+                        key: i
+                    })
+                    previews.push(image);
+                }
+
+            }
+
+        }
+
+        setImagePreviews(previews)
+    }
+
+    return <div className="flex w-full justify-center p-2">
+        <Dialog open={formOpen} onOpenChange={setFormOpen}>
+            <DialogTrigger asChild >
                 <Button className="justify-self-center w-fit " variant={"outline"}>+ Add new trade details</Button>
-            </div>
-        </DialogTrigger>
+            </DialogTrigger>
         <DialogContent>
             <DialogHeader>
                 <DialogTitle>New Trade</DialogTitle>
@@ -181,13 +228,13 @@ export default function TradeDetailsForm({ forDate, onDataSubmit }: Props) {
 
             <Separator />
 
-            <form ref={formState} onPaste={(e) => handleOnImagePaste(e)}>
+                <form ref={formState} onPaste={(e) => handleOnImagePaste(e)} onSubmit={(e) => handleSubmit(e)}>
                 <ScrollArea className="h-[500px]">
                     <div className="grid w-full max-w-sm items-center gap-4 p-2">
-                        <Label aria-label="max-day" className="text-sm text-slate-500">Max days traded: {(day! - 1).toString()}</Label>
+                            <Label aria-label="max-day" className="text-sm text-slate-500">Max days traded: {day ? day : 0}</Label>
 
                         <div className="label-distance">
-                            <Label aria-label="Day">Day: </Label>
+                                <Label aria-label="Day" htmlFor="day">Day: </Label>
                             {/* <DateTimePicker isRequired={true} key="dateTimePicker" granularity="minute" value={ } /> */}
                             <Input type="number" name="day" id="day" value={day as number} onChange={(e) => setDay(parseInt(e.target.value))} />
                         </div>
@@ -228,12 +275,12 @@ export default function TradeDetailsForm({ forDate, onDataSubmit }: Props) {
 
                         <div className="label-distance">
                             <Label htmlFor="rr">RR / RR on index: </Label>
-                            <Input type="number" name="rr" id="rr" placeholder="Risk to reward ratio" required />
+                                <Input type="number" name="rr" id="rr" placeholder="Risk to reward ratio" required step="any" min={0} />
                         </div>
 
                         <div className="label-distance">
                             <Label htmlFor="rrOnPremium">RR / RR on premium: </Label>
-                            <Input type="number" id="rrOnPremium" name="rrOnPremium" placeholder="Risk to reward ratio on FnO chart" />
+                                <Input type="number" id="rrOnPremium" name="rrOnPremium" placeholder="Risk to reward ratio on FnO chart" step="any" min={0} />
                         </div>
 
                         <div className="label-distance">
@@ -252,6 +299,10 @@ export default function TradeDetailsForm({ forDate, onDataSubmit }: Props) {
                                     <Label className="hover:cursor-pointer" htmlFor="CTC">Cost To Cost (CTC)</Label>
                                 </div>
                                 <div className="flex items-center space-x-2">
+                                        <RadioGroupItem value="partialSL" id="partialSL" />
+                                        <Label className="hover:cursor-pointer" htmlFor="partialSL">Partial Stop Loss</Label>
+                                    </div>
+                                    <div className="flex items-center space-x-2">
                                     <RadioGroupItem value="SL" id="SL" />
                                     <Label className="hover:cursor-pointer" htmlFor="SL">Stop Loss (SL Hit)</Label>
                                 </div>
@@ -270,28 +321,38 @@ export default function TradeDetailsForm({ forDate, onDataSubmit }: Props) {
 
                         <div className="label-distance">
                             <Label htmlFor="images">Images: </Label>
-                            <Input id="images" name="images" type="file" multiple={true} accept="image/png, image/gif, image/jpeg" />
+                                <Input ref={inputImagesRef} onChange={() => setImagePreview()} id="images" name="images" type="file" multiple={true} accept="image/png, image/gif, image/jpeg" />
                         </div>
 
                         <div className="label-distance" id="imagePreview">
-                            {imagePreviews}
+                                {
+                                    imagePreviews
+                                }
                         </div>
                     </div>
 
-                </ScrollArea>
-            </form>
+                    </ScrollArea>
+                    <DialogFooter className="sm:justify-start p-2">
+                        <div>
+                            <Button type="submit" variant="default" disabled={loading}>
+                                Submit
+                            </Button>
+                        </div>
+                        <div>
+                            <Button type="reset" variant="outline">
+                                Reset
+                            </Button>
+                        </div>
+                    </DialogFooter>
+                </form>
 
-            <DialogFooter className="sm:justify-start p-2">
-                <DialogClose asChild>
-                    <Button type="button" variant="secondary" onClick={(e) => handleSubmit(e)}>
-                        Submit
-                    </Button>
-                </DialogClose>
-            </DialogFooter>
+
         </DialogContent>
     </Dialog>
 
+    </div>
 
 
 
 }
+

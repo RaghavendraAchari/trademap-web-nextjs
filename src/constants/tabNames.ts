@@ -9,7 +9,7 @@ const tabs = [
         tabName: "Dashboard",
     },
     {
-        url: "/allTrades",
+        url: "/allTrades/",
         tabName: "All Trades"
     },
     // {
@@ -17,13 +17,17 @@ const tabs = [
     //     tabName: "Pending Days"
     // },
     {
-        url: "/notes",
+        url: "/notes/",
         tabName: "Personal Notes"
     },
     {
-        url: "/insights",
+        url: "/insights/",
         tabName: "Insights on setups"
     },
+    // {
+    //     url: "/test/",
+    //     tabName: "Test app components here"
+    // },
 ]
 
 export default tabs;

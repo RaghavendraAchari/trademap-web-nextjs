@@ -2,47 +2,24 @@
 
 import TradeDetailsList from "@/components/tradeDetails/TradeDetailsList";
 import { useToast } from "@/components/ui/use-toast";
-import Trade from "@/models/Trade";
-import { getAllTrades } from "@/services/TradeDetailsService";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useState } from "react";
 import Loading from "../loading";
-import { ArrowDownWideNarrowIcon, ArrowUpWideNarrowIcon, DotIcon } from "lucide-react";
+import { DotIcon, Terminal } from "lucide-react";
 import { SORT } from "@/constants/SortType";
 import { SortByDate } from "@/components/commons/SortByDate";
-import useFetchAllTrades from "./useFetchAllTrades";
+import useFetchAllTrades from "../../hooks/allTrades/useFetchAllTrades";
 import backendUrls from "@/constants/backendUrls";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 export default function AllTrades() {
-    const [trades, setTrades] = useState<Trade[]>([])
 
-    const { } = useFetchAllTrades(backendUrls.tradeDetails.allTrades)
-    const [error, setError] = useState(false)
-    const [fetchingData, setFetchingData] = useState(true)
+    const { data: trades, error, loading: fetchingData, refresh } = useFetchAllTrades(backendUrls.tradeDetails.allTrades)
 
     const [pageNumber, setPageNumber] = useState(0)
     const [pageSize, setPageSize] = useState(10)
     const [sort, setSort] = useState<SORT>("DESC")
 
     const { toast } = useToast()
-
-    const fetchAllTrades = (sort: string) => {
-        setFetchingData(true)
-
-        getAllTrades(pageNumber, pageSize)
-            .then(response => {
-            const data = response.data;
-            console.log(data);
-
-            setTrades(data);
-
-        }).catch(err => { setError(true); })
-
-        setFetchingData(false)
-    }
-
-    useEffect(() => {
-        fetchAllTrades(sort);
-    }, [])
 
     return (
         <div className="grow h-full flex flex-col overflow-y-auto">
@@ -55,13 +32,17 @@ export default function AllTrades() {
                     fetchingData && <Loading />
                 }
                 {
-                    fetchingData === false && trades.length > 0 ? <div>
+                    fetchingData === false && trades && trades.length > 0 ? <div>
                         <TradeDetailsList tradesList={trades} showFullDate={true} />
                         <DotIcon className="self-center mx-auto opacity-50 w-10 h-10" />
                     </div> : null
                 }
                 {
-                    fetchingData === false && trades.length === 0 ? <p>No trades found</p> : null
+                    fetchingData === false && trades && trades.length === 0 ? <Alert variant={"default"}>
+                        <Terminal />
+                        <AlertTitle>No trades found</AlertTitle>
+                        <AlertDescription>It looks like you have not taken any trades.</AlertDescription>
+                    </Alert> : null
                 }
             </div>
         </div>

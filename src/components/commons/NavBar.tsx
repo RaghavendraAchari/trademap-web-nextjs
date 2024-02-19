@@ -16,8 +16,8 @@ import MenuIcon from "../icons/munu-icon";
 import { Separator } from "../ui/separator";
 import tabs from "@/constants/tabNames";
 import { useRef, useState } from "react";
-import { Button } from "../ui/button";
-import { X } from "lucide-react";
+// import appIcon from "@/assets/app-icon.svg"
+// import menuIcon from "@/assets/menu.svg"
 
 
 interface Props {
@@ -30,12 +30,12 @@ export default function Navbar({ className }: Props) {
 
     return <header className={className}>
         <div className="flex flex-row grow justify-start space-x-2 items-center">
-            <img className='max-h-8 max-w-8 align-center' src="app-icon.svg" alt="app-icon" />
+            <img className='max-h-8 max-w-8 align-center' src="/app-icon.svg" alt="app-icon" />
             <h1 className='text-lg font-medium text-white'>Trade Map</h1>
         </div>
 
         <Sheet open={open} onOpenChange={setOpen}>
-            <SheetTrigger><img className="w-5 h-5" src="menu.svg" alt="Menu" /></SheetTrigger>
+            <SheetTrigger><img className="w-5 h-5" src="/menu.svg" alt="Menu" /></SheetTrigger>
             <SheetContent>
                 <SheetHeader>
                     <SheetTitle className="text-left">Navigation</SheetTitle>

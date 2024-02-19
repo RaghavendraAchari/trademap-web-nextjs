@@ -1,14 +1,14 @@
 'use client';
 
 import NoteWithTimeline from "@/components/commons/NoteCardWithTimeline";
-import Note from "@/models/Note";
+import Note from "@/models/notes/Note";
 import { useState } from "react";
-import NotesFilter from "./components/NotesFilter";
-import EditNote from "./components/EditNote";
+import NotesFilter from "../../components/notes/NotesFilter";
+import EditNote from "../../components/notes/EditNote";
 import Loading from "../loading";
 import { SortByDate } from "@/components/commons/SortByDate";
 import { SORT } from "@/constants/SortType";
-import useFetch from "@/components/hooks/useFetch";
+import useFetch from "@/hooks/useFetch";
 import backendUrls from "@/constants/backendUrls";
 
 import {
@@ -22,6 +22,8 @@ import {
     DrawerTrigger,
 } from "@/components/ui/drawer"
 import { Button } from "@/components/ui/button";
+import axios from "axios";
+import { useToast } from "@/components/ui/use-toast";
 
 
 interface Filters {
@@ -42,11 +44,26 @@ export default function AllTrades() {
     const [sort, setSort] = useState<SORT>("DESC");
 
     const [editNote, setEditNoteContent] = useState<Note | null>({} as Note);
+    const { toast } = useToast()
+
+    const handleDeleteNote = (note: Note) => {
+        axios.delete(backendUrls.notes.allNotes, {
+            params: {
+                "id": note.id
+            }
+        }).then((res) => {
+            refresh();
+        }).catch(err => {
+            toast({
+                title: "Could not delete the note."
+            })
+        })
+    }
 
     let notesList = null;
     if (notes && notes.length > 0) {
         notesList = notes.map(it => {
-            return <NoteWithTimeline note={it} key={it.id} />
+            return <NoteWithTimeline note={it} key={it.id} handleDeleteNote={handleDeleteNote} />
         })
     }
 

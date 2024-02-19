@@ -5,7 +5,8 @@ import { getDateInISOAsLocalDate } from "@/lib/dateUtils"
 import axios, { AxiosError } from "axios"
 import { useToast } from "../ui/use-toast"
 import { Checkbox } from "../ui/checkbox"
-import useRefreshEvent from "../hooks/useRefreshEvent"
+import useRefreshEvent from "../../hooks/useRefreshEvent"
+import Loader from "../commons/LoadingSpinner"
 
 
 interface Props {
@@ -30,7 +31,7 @@ const classNames = {
 export default function NoTradingDayForm({ forDate, onDataSubmit }: Props) {
     const [state, setState] = useState<State>(null)
     const { toast } = useToast()
-    const { refreshComponents } = useRefreshEvent()
+    const [submiting, setSubmitig] = useState(false);
 
     const handleSubmit = (e: FormEvent) => {
         e.preventDefault();
@@ -42,7 +43,7 @@ export default function NoTradingDayForm({ forDate, onDataSubmit }: Props) {
             dateTime: getDateInISOAsLocalDate(forDate),
             remarks: ""
         }
-        // console.log(postData);
+        setSubmitig(true)
 
         axios.post("http://localhost:8080/tradedetails/setNoTradingDay", postData)
             .then(() => {
@@ -64,6 +65,8 @@ export default function NoTradingDayForm({ forDate, onDataSubmit }: Props) {
                     title: title,
                     description: "Data is sent to server successfully."
                 })
+
+                setSubmitig(false);
                 onDataSubmit();
 
             })
@@ -107,6 +110,6 @@ export default function NoTradingDayForm({ forDate, onDataSubmit }: Props) {
                 Mark as weekend
             </label>
         </div>
-        <Button className="mr-0 self-end" type="submit" variant={"outline"}>Update</Button>
+        <Button className="mr-0 self-end" type="submit" variant={"outline"}>{submiting ? <Loader loading={submiting} /> : "Update"}</Button>
     </form>
 }

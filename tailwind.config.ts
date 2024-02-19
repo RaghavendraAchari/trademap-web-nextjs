@@ -5,6 +5,7 @@ const config: Config = {
   content: [
     './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
     './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/commons/**/*.{js,ts,jsx,tsx,mdx}',
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
     './pages/**/*.{ts,tsx}',
     './components/**/*.{ts,tsx}',
@@ -89,6 +90,6 @@ const config: Config = {
       },
     },
   },
-  plugins: [require("tailwindcss-animate"), require('@tailwindcss/typography')],
+  plugins: [require('@tailwindcss/typography'), require("tailwindcss-animate")],
 }
 export default config

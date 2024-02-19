@@ -3,13 +3,13 @@
 import TradesDetails from "@/components/dashboard/TradeDetails";
 import PendingDays from "@/components/dashboard/PendingDetails";
 import { useState } from "react";
-import useCurrentDate from "@/components/hooks/useCurrentTime";
+import useCurrentDate from "@/hooks/useCurrentTime";
 import PageHeader from "@/components/commons/PageHeader";
-import useRefreshEvent from "@/components/hooks/useRefreshEvent";
+import useRefreshEvent from "@/hooks/useRefreshEvent";
 import backendUrls from "@/constants/backendUrls";
-import useFetch from "@/components/hooks/useFetch";
+import useFetch from "@/hooks/useFetch";
 import { getDateInISOAsLocalDate } from "@/lib/dateUtils";
-import Trade from "@/models/Trade";
+import Trade from "@/models/trade/Trade";
 
 
 export default function Home() {

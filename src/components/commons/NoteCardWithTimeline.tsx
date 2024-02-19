@@ -1,23 +1,35 @@
 import { getDateInISOAsLocalDate, getFullDateTime } from "@/lib/dateUtils";
-import Note from "@/models/Note"
+import Note from "@/models/notes/Note"
+
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
+import { Button } from "../ui/button";
+import { MoreVerticalIcon, Trash2Icon } from "lucide-react";
 
 interface Props {
-    note: Note
+    note: Note,
+    handleDeleteNote: (note: Note) => void
 }
 
-export default function NoteWithTimeline({ note }: Props) {
+export default function NoteWithTimeline({ note, handleDeleteNote }: Props) {
     let categories = null, tags = null;
 
     if (note.categories && note.categories.length > 0) {
-        categories = note.categories.map((it) => <span key={it} className="rounded-full bg-white p-1 px-2 text-xs shadow-md">{it}</span>);
+        categories = note.categories.map((it) => <span key={it} className="rounded-full border p-1 px-2 text-xs">{it}</span>);
     }
 
     if (note.tags && note.tags.length > 0) {
-        tags = note.tags.map((it) => <span key={it} className="rounded-full bg-white p-1 px-2 text-xs shadow-md">{it}</span>);
+        tags = note.tags.map((it) => <span key={it} className="rounded-full border p-1 px-2 text-xs">{it}</span>);
     }
 
 
-    return <div className="note mx-auto flex min-h-64 flex-row bg-slate-50 p-2 py-0 min-w-full">
+    return <div className="note mx-auto flex min-h-64 flex-row  p-2 py-0 min-w-full">
         <div className="timeline min-h-full w-4 border border-gray-200 bg-primary shadow-md"></div>
 
         <div className="connector z-10 -ml-4 flex min-h-full w-20 items-center">
@@ -27,18 +39,30 @@ export default function NoteWithTimeline({ note }: Props) {
         </div>
 
         <div className="py-2 w-full">
-            <div className="card border z-9 -ml-6 flex min-h-full w-full flex-col self-center rounded-lg bg-white p-2 pl-8 text-justify text-sm font-bold shadow whitespace-pre capitalize">
-                <div className="dateTime"><p className="text-end opacity-[75%] font-mono">{getFullDateTime(new Date(note.dateTime))}</p></div>
-                <div className="header flex min-h-10 w-full items-center justify-between gap-1 rounded-tl-md rounded-tr-md bg-slate-100 px-2">
-                    <h5 className="grow text-wrap py-2 capitalize">{note.title}</h5>
+            <div className="card border z-9 -ml-6 flex min-h-full w-full max-w-full flex-col self-center rounded-lg bg-white p-2 pl-8 text-justify text-sm font-bold shadow whitespace-pre first-letter:capitalize">
+                <div className="dateTime">
+                    <p className="flex items-center justify-end text-end opacity-[75%] font-medium text-xs">
+                        {getFullDateTime(new Date(note.dateTime))}
+                        <DropdownMenu >
+                            <DropdownMenuTrigger asChild className="cursor-pointer ml-1 "><Button className="p-0 px-2" size={"sm"} variant={"ghost"}><MoreVerticalIcon size={16} /></Button></DropdownMenuTrigger>
+                            <DropdownMenuContent align="end" className="text-xs">
+                                <DropdownMenuItem onClick={() => handleDeleteNote(note)} className="space-x-1 cursor-pointer text-sm"><Trash2Icon size={16} /><span>Delete</span></DropdownMenuItem>
+                            </DropdownMenuContent>
+                        </DropdownMenu>
+                    </p>
+                </div>
+                <div className="header flex min-h-10 w-full items-center justify-between gap-1 rounded-tl-md rounded-tr-md  px-2">
+                    <h5 className="grow text-wrap py-2 ">{note.title}</h5>
                     <div className="flex-none self-start py-2">
                         {tags}
                     </div>
                 </div>
 
-                <div className="body grow px-2 text-sm font-medium min-h-[6em] capitalize">{note.content}</div>
+                <article className="body grow px-2 text-sm font-medium min-h-[6em] max-w-full flex">
+                    <p className="text-wrap break-words" style={{ "textWrap": "wrap" }}>{note.content}</p>
+                </article>
 
-                <div className="footer flex min-h-10 w-full items-center justify-between gap-1 rounded-bl-md rounded-br-md bg-slate-200 px-2 py-2">
+                <div className="footer flex min-h-10 w-full items-center justify-between gap-1 rounded-bl-md rounded-br-md  px-2 py-2">
                     <h5 className="grow text-wrap opacity-80">{note.desciption}</h5>
                     <div className="tags flex-none self-end py-2">
                         {categories}
