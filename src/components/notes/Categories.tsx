@@ -5,6 +5,25 @@ import { useState } from "react"
 
 export default function Categories({ categories, addNewCategories, setCategories, removeCategories }: { categories: string[], addNewCategories: (state: string) => void, setCategories: (state: any) => void, removeCategories: (index: number) => void }) {
     const [state, setState] = useState("")
+    const [error, setError] = useState<string>("")
+    const expression = /^#\w+$/ug;
+
+    const handleOnEnterPressed = () => {
+        if (state !== "" && state.match(expression)) {
+            addNewCategories(state);
+            setState("");
+        }
+    }
+
+    const handleOnBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+        if (e.target.value !== "" && e.target.value.match(expression)) {
+            addNewCategories(state);
+            setState("");
+            setError("")
+        } else {
+            setError("Tags must start with '#' character")
+        }
+    }
 
     return <div className="space-y-1">
         {
@@ -20,29 +39,21 @@ export default function Categories({ categories, addNewCategories, setCategories
                 className="px-1 h-8"
                 value={state}
                 type="text"
-                placeholder="#CATEGORY"
+                placeholder="#TAG"
                 onChange={(e) => setState(e.target.value)}
                 onKeyUp={(e) => {
                     if (e.key === 'Enter') {
-                        addNewCategories(state);
-                        setState("");
+                        handleOnEnterPressed()
                     }
                 }}
                 onBlur={(e) => {
-                    const expression = /^#\w+$/ug;
-                    console.log(e.target.value.match(expression));
-
-                    if (e.target.value !== "" && e.target.value.match(expression)) {
-                        addNewCategories(state);
-                        setState("");
-                    } else {
-                        alert("Category must start with '#' character")
-                    }
+                    handleOnBlur(e);
                 }}
             />
             <Button title="Add a new category" size={"icon"} variant={"ghost"} className="h-4 w-4 text-slate-600 rounded-full flex items-center justify-center font-semibold shadow-sm" onClick={() => { addNewCategories(state); setState("") }}><PlusCircleIcon /></Button>
 
         </div>
+        <div className="text-xs text-red-500 font-medium">{error !== "" && error}</div>
 
     </div>
 

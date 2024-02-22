@@ -5,7 +5,26 @@ import { useState } from "react"
 
 export default function Tags({ tags, addNewTag, setTags, removeTag }: { tags: string[], addNewTag: (state: string) => void, setTags: (state: any) => void, removeTag: (index: number) => void }) {
     const [state, setState] = useState("");
+    const [error, setError] = useState<string>("")
+    const expression = /^\w+(?:\s)?(?=\p{Emoji})\p{Emoji}$/ug;
 
+    const handleOnEnterPressed = () => {
+        if (state !== "" && state.match(expression)) {
+            addNewTag(state);
+            setState("");
+            setError("")
+        }
+    }
+
+    const handleOnBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+        if (e.target.value !== "" && e.target.value.match(expression)) {
+            addNewTag(state);
+            setState("");
+            setError("")
+        } else {
+            setError("Category must have one word and one emoji")
+        }
+    }
     return <div className="space-y-1">
         {
             tags.map((tag, index) => {
@@ -16,26 +35,21 @@ export default function Tags({ tags, addNewTag, setTags, removeTag }: { tags: st
             })
         }
         <div className="flex flex-row gap-1 items-center">
-            <Input className="px-1 h-8 " value={state} type="text" placeholder="Tag 🔥" onChange={(e) => {
-                setState(e.target.value)
-
-            }}
+            <Input
+                className="px-1 h-8 "
+                value={state}
+                type="text"
+                placeholder="Category 🔥"
+                onChange={(e) => {
+                    setState(e.target.value)
+                }}
                 onKeyUp={(e) => {
                     if (e.key === 'Enter') {
-                        addNewTag(state);
-                        setState("");
+                        handleOnEnterPressed()
                     }
                 }}
                 onBlur={(e) => {
-                    const expression = /^\w+(?:\s)?(?=\p{Emoji})\p{Emoji}$/ug;
-                    console.log(e.target.value.match(expression));
-
-                    if (e.target.value !== "" && e.target.value.match(expression)) {
-                        addNewTag(state);
-                        setState("");
-                    } else {
-                        alert("Tag must have one word and one emoji")
-                    }
+                    handleOnBlur(e)
                 }}
             />
             <Button title="Add a new tag" size={"icon"} variant={"ghost"} className="h-4 w-4 text-slate-600 rounded-full flex items-center justify-center font-semibold shadow-sm " onClick={() => {
@@ -45,6 +59,8 @@ export default function Tags({ tags, addNewTag, setTags, removeTag }: { tags: st
                 <PlusCircleIcon />
             </Button>
         </div>
+        <div className=" text-wrap text-xs text-red-500 font-medium">{error !== "" && error}</div>
+
     </div >
 
 }

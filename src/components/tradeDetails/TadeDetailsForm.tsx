@@ -48,6 +48,7 @@ export default function TradeDetailsForm({ forDate, onDataSubmit }: Props) {
     const { toast } = useToast()
     const [fetchingData, setFetchingData] = useState(true)
     const [day, setDay] = useState<null | number>(null)
+    const [maxDay, setMaxDay] = useState<null | number>(null)
 
     const [formValues, setFormValues] = useState({
         "day": "",
@@ -148,6 +149,7 @@ export default function TradeDetailsForm({ forDate, onDataSubmit }: Props) {
 
                 if (res.status === 200) {
 
+                    setMaxDay(res.data.days)
                     setDay(res.data.days + 1)
                 } else {
                     toast({
@@ -231,12 +233,11 @@ export default function TradeDetailsForm({ forDate, onDataSubmit }: Props) {
                 <form ref={formState} onPaste={(e) => handleOnImagePaste(e)} onSubmit={(e) => handleSubmit(e)}>
                 <ScrollArea className="h-[500px]">
                     <div className="grid w-full max-w-sm items-center gap-4 p-2">
-                            <Label aria-label="max-day" className="text-sm text-slate-500">Max days traded: {day ? day : 0}</Label>
+                            <Label aria-label="max-day" className="text-sm text-slate-500">Max days traded: {maxDay ? maxDay : 0}</Label>
 
                         <div className="label-distance">
                                 <Label aria-label="Day" htmlFor="day">Day: </Label>
-                            {/* <DateTimePicker isRequired={true} key="dateTimePicker" granularity="minute" value={ } /> */}
-                            <Input type="number" name="day" id="day" value={day as number} onChange={(e) => setDay(parseInt(e.target.value))} />
+                                <Input type="number" name="day" id="day" value={day?.toString()} onChange={(e) => setDay(parseInt(e.target.value))} />
                         </div>
 
                         <div className="label-distance">

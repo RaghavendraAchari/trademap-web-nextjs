@@ -13,9 +13,7 @@ import Trade from "@/models/trade/Trade";
 
 
 export default function Home() {
-
   const [forDate, setForDate] = useState<Date>(new Date())
-  const { dateAsString } = useCurrentDate();
 
   let url = "";
 
@@ -37,9 +35,9 @@ export default function Home() {
   }
 
   return (
-    <div className="md:flex md:flex-row md:grow md:max-h-full md:divide-x">
+    <div className="md:flex md:flex-row md:grow md:max-h-full md:divide-x md:overflow-y-auto">
       <TradesDetails
-        className='flex-grow flex flex-col w-full max-h-full lg:flex-auto lg:w-[70%] bg-background p-3 overflow-y-auto'
+        className='grow flex flex-col w-full max-h-full lg:w-[70%] bg-background p-3 overflow-y-auto'
         forDate={forDate}
         trades={trades}
         error={tradeError}

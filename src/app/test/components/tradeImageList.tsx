@@ -35,7 +35,7 @@ export default function TradeImageList({ trade }: { trade: Trade }) {
 
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger className="min-w-fit max-w-fit max-h-[50vh] " asChild>
-                <div className="flex flex-row gap-1 ">
+                <div className="flex flex-row gap-1 flex-wrap">
                     {trade.imagePaths.map((image, index) => <ImageWithLoader className="bg-background h-32 p-1 w-64 object-contain rounded-md border hover:shadow" onClick={() => {
                         setSelectedIndex(index)
                     }} key={index} path={image} />)}

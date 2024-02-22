@@ -15,6 +15,7 @@ import { getDateInISOAsLocalDate, getFullDateTime, getFullDateTimeWithMinutes } 
 import axios from "axios";
 import backendUrls from "@/constants/backendUrls";
 import { useToast } from "@/components/ui/use-toast";
+import { format } from "date-fns";
 
 interface Props {
     note: Note,
@@ -78,11 +79,17 @@ export default function EditNote({ note, onSave }: Props) {
         </div>
 
         <div className="py-2 w-full">
-            <div className="card z-9 -ml-6 flex min-h-full w-full flex-col self-center rounded-lg bg-white p-2 pl-8 text-justify text-base font-medium shadow border ">
-                <div className="dateTime"><p className="text-xs text-end opacity-80">{getFullDateTimeWithMinutes(date)}</p></div>
+            <form
+                onSubmit={(e) => {
+                    e.preventDefault();
+                    handleOnSave()
+                }}
+
+                className="card z-9 -ml-6 flex min-h-full w-full flex-col self-center rounded-lg bg-white p-2 pl-8 text-justify text-base font-medium shadow border ">
+                <div className="dateTime"><p className="text-xs text-end opacity-80">{format(date, "d MMM yyyy - h:mm:ss a")}</p></div>
 
                 <div className="header flex flex-col md:flex-row items-start justify-between gap-1 rounded-tl-md rounded-tr-md bg-slate-100 px-2 py-2">
-                    <Input name="title" value={title} className="grow text-wrap h-8" placeholder="Add title" onChange={(e) => setTitle(e.target.value)} />
+                    <Input name="title" value={title} className="grow text-wrap h-8" placeholder="Add title" onChange={(e) => setTitle(e.target.value)} required />
 
                     <div className="flex-none flex items-center justify-start self-start  space-x-1">
                         <Tags tags={tags} setTags={setTags} addNewTag={addNewTag} removeTag={removeTag} />
@@ -95,7 +102,9 @@ export default function EditNote({ note, onSave }: Props) {
                     onChange={e => setDescription(e.target.value)}
                     className="body grow px-2 text-sm font-medium my-1"
                     placeholder="Add note details here..."
-                    rows={5}>
+                    rows={5}
+                    required
+                >
 
                 </Textarea>
 
@@ -106,9 +115,9 @@ export default function EditNote({ note, onSave }: Props) {
                     </div>
                 </div>
                 <div className="flex min-h-10 w-full items-center justify-end gap-1 rounded-bl-md rounded-br-md bg-background px-2 py-2">
-                    <Button className="button border border-slate-200 p-2 " onClick={handleOnSave}>Save</Button>
+                    <Button type="submit" className="button border border-slate-200 p-2 " >Save</Button>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
 }

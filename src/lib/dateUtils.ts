@@ -2,7 +2,7 @@ import { format } from "date-fns"
 
 
 export function getDateInISOAsLocalDate(date: Date): string {
-    return new Date(date.getTime() - date.getTimezoneOffset() * 60 * 1000).toISOString().substring(0, 16)
+    return date.toISOString().substring(0, 16)
 }
 
 export function getTimeIn12HrFormat(date: Date) {

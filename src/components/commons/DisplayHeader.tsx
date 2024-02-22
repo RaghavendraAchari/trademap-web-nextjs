@@ -33,6 +33,10 @@ export default function DisplayHeader({ className, ...props }: Props) {
             title = 'Insights'
             description = "Includes all the learning and observations from the trade history."
             break;
+        case "/analytics/":
+            title = 'Analytics'
+            description = "Summary of your trading journey."
+            break;
         case "/test/":
             title = 'Test'
             description = "Test app components here."

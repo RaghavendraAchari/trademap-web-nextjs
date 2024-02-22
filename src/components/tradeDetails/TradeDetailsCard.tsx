@@ -40,7 +40,7 @@ export default function TradeDetailsCard({ trade, showFullDate, showOptions = fa
             title = "Weekend"
 
         return <Card className="mt-2">
-            <CardHeader className="py-2 flex flex-row items-center space-y-0 space-x-1">
+            <CardHeader className="p-2 md:p-6 md:py-2 flex flex-row items-center space-y-0 space-x-1">
                 <InstrumentTypeLogo trade={trade} />
                 <CardTitle className="flex flex-row justify-between items-center grow">
                     <span className="text-sm md:text-lg">{title}</span>
@@ -51,12 +51,12 @@ export default function TradeDetailsCard({ trade, showFullDate, showOptions = fa
     }
 
     return <Card className="mt-2">
-        <CardHeader className="py-2 flex flex-row items-center justify-start space-y-0 space-x-1">
+        <CardHeader className="p-2 md:p-6 md:py-2 flex flex-row items-center justify-start space-y-0 space-x-1">
             <InstrumentTypeLogo trade={trade} />
             <CardTitle className="flex flex-row justify-between items-center grow">
                 <span className="text-sm md:text-lg">{"Trade No: " + trade.id} ({trade.setupName})</span>
                 <div className="flex flex-row items-center space-x-1">
-                    <span className="text-xs md:text-sm text-slate-500">{showFullDate ? getFullDateTime(new Date(trade.dateTime)) : getTimeIn12HrFormat(new Date(trade.dateTime))}</span>
+                    <span className="text-xs text-right md:text-sm text-slate-500">{showFullDate ? getFullDateTime(new Date(trade.dateTime)) : getTimeIn12HrFormat(new Date(trade.dateTime))}</span>
                     {showOptions && <div>
                         <DropdownMenu >
                             <DropdownMenuTrigger asChild className="cursor-pointer ml-1 "><Button size={"icon"} variant={"ghost"}><MoreVertical size={16} /></Button></DropdownMenuTrigger>
@@ -70,7 +70,7 @@ export default function TradeDetailsCard({ trade, showFullDate, showOptions = fa
                 </div>
             </CardTitle>
         </CardHeader>
-        <CardContent className="space-y-2 space-x-1 min-h-full flex flex-row justify-between overflow-y-auto bg-slate-50">
+        <CardContent className="p-2 md:p-6 md:pt-0 space-y-2 space-x-1 flex flex-row justify-between overflow-y-auto bg-slate-50">
             <div className="w-10 h-10 flex-none"></div>
             <div className="grow space-y-2">
                 <div className="text-sm text-slate-700 py-2 whitespace-pre-wrap">{trade.remarks}</div>
@@ -99,7 +99,7 @@ export default function TradeDetailsCard({ trade, showFullDate, showOptions = fa
                 }
             </div>
         </CardContent>
-        <CardFooter className="flex justify-start align-center py-2 space-x-1">
+        <CardFooter className="p-2 md:p-6 flex justify-start align-center py-2 space-x-1">
             <div className="w-10"></div>
 
             <div className="flex flex-col space-y-1 md:space-y-0 md:flex-row justify-between w-full text-center">

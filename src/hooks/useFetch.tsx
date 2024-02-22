@@ -27,8 +27,6 @@ export default function useFetch<T>(url: string) {
     }
 
     useEffect(() => {
-        // console.log("Fetching data inside useEffect");
-
         fetchData(url);
     }, [url])
 

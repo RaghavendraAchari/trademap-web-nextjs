@@ -10,12 +10,15 @@ import {
     SheetHeader,
     SheetTitle,
     SheetTrigger,
-    SheetClose
+    SheetClose,
+    SheetFooter
 } from "@/components/ui/sheet"
 import MenuIcon from "../icons/munu-icon";
 import { Separator } from "../ui/separator";
 import tabs from "@/constants/tabNames";
 import { useRef, useState } from "react";
+import SettingsWindow from "../settingsWindow/SettingsWindow";
+
 // import appIcon from "@/assets/app-icon.svg"
 // import menuIcon from "@/assets/menu.svg"
 
@@ -42,15 +45,18 @@ export default function Navbar({ className }: Props) {
                     <SheetDescription className="text-left">
                         Click on the tab to navigate.
                     </SheetDescription>
-                    <Separator />
+                </SheetHeader>
+                <Separator />
                     <div>
                         <ul className="text-main font-bold mt-4 space-y-2 text-left">
                             {tabs.map(tab => {
-                                return <li key={tab.url}><Link onClick={() => setOpen(false)} href={tab.url} >{tab.tabName}</Link></li>
+                                return <li key={tab.url}><Link className="flex flex-row space-x-2 items-center justify-start" onClick={() => setOpen(false)} href={tab.url} ><span>{tab.icon}</span> <span>{tab.tabName}</span></Link></li>
                             })}
                         </ul>
                     </div>
-                </SheetHeader>
+                <SheetFooter className="mt-10">
+                    <SettingsWindow />
+                </SheetFooter>
             </SheetContent>
         </Sheet>
 

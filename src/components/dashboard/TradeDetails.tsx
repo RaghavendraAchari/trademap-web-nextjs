@@ -40,7 +40,8 @@ export default function TradesDetails({ trades, error, loading, forDate, setForD
         </div>
 
         <Separator className="flex-none" />
-        <div className="grow overflow-y-auto">
+
+        <div className="grow w-full max-h-full flex flex-col px-1 md:overflow-y-auto">
             {loading ? <Loading /> : null}
 
             {
@@ -53,7 +54,9 @@ export default function TradesDetails({ trades, error, loading, forDate, setForD
                     : null
             }
 
-            {!loading && trades && trades.length > 0 ? <DisplayTrades trades={trades} forDate={forDate} onDataSubmit={onDataSubmit} /> : null}
+            {!loading && trades && trades.length > 0 ?
+                <DisplayTrades trades={trades} forDate={forDate} onDataSubmit={onDataSubmit} />
+                : null}
             {!loading && error ? <TradeDetailsError /> : null}
         </div>
 

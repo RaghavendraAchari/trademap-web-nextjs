@@ -111,22 +111,31 @@
   }
 }
 
+.text-wrap{
+  text-wrap: wrap;
+}
+
 .ce-toolbar__actions{
   @apply md:left-[0%] lg:-left-[0%] xl:-left-[4%] 2xl:-left-[15%]; 
   
 }
+
 .ce-toolbar{
   @apply md:w-full;
 }
+
 .ce-toolbar__content{
   @apply md:w-full ml-1;
 }
+
 .ce-toolbar__actions{
   @apply md:left-0;
 }
+
 .ce-block__content{
   @apply md:mx-16 md:max-w-full;
 }
+
 .cdx-input.image-tool__caption {
   @apply text-xs font-semibold opacity-70 text-center;
 }
