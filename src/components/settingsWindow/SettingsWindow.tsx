@@ -5,18 +5,14 @@ import { Input } from "../ui/input";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
 import { Switch } from "../ui/switch";
 import { Button } from "../ui/button";
-import backendUrls from "@/constants/backendUrls";
-import useFetchSettings from "@/hooks/settings/useFetchSettings";
-import { FormEvent, useEffect, useState } from "react";
-import axios, { Axios, AxiosError } from "axios";
-import { useToast } from "../ui/use-toast";
+import { FormEvent, useContext, useEffect, useState } from "react";
+import SettingsModel from "@/models/settings/settings.model";
+import { SettingsContext } from "@/context/SettingsContext";
+
 
 export default function SettingsWindow() {
     const [open, setOpen] = useState(false);
-    const { toast } = useToast()
-
-    const { data, error, loading, refresh, notFound } = useFetchSettings(backendUrls.settings);
-    // console.log(data);
+    const settingsContext = useContext(SettingsContext);
 
 
     const onSettingsSubmit = (e: FormEvent<HTMLFormElement>) => {
@@ -26,50 +22,18 @@ export default function SettingsWindow() {
 
         let id: any = null;
 
-        if (data && data.id) id = data.id
+        if (settingsContext && settingsContext.data?.id) id = settingsContext.data?.id
 
-        const dataObject = {
+        const dataObject: unknown = {
             id: id,
             maxTradesLimit: formData.get("maxTrades"),
             warnWhenMaxLimitReached: formData.get("maxTradesWarning") === "on" ? true : false,
             trackingDate: formData.get("date"),
         }
-        console.log(dataObject);
 
-
-        if (notFound && data === null) {
-            axios.post(backendUrls.settings, dataObject)
-                .then((res) => {
-                    toast({
-                        title: "Settings saved successfully."
-                    })
-                }).catch((e: AxiosError) => {
-                    if (e.response) {
-                        toast({
-                            title: "Error"
-                        })
-                    }
-                }).finally(() => setOpen(false))
-        } else {
-            axios.put(backendUrls.settings, dataObject)
-                .then((res) => {
-                    toast({
-                        title: "Settings updated successfully."
-                    })
-                }).catch((e: AxiosError) => {
-                    if (e.response) {
-                        toast({
-                            title: "Error"
-                        })
-                    }
-                }).finally(() => setOpen(false))
-        }
-
+        settingsContext?.onSubmit(dataObject as SettingsModel);
+        setOpen(false)
     }
-
-    useEffect(() => {
-        refresh()
-    }, [open])
 
     return <div className='flex flex-row justify-start' >
         <Dialog open={open} onOpenChange={setOpen}>
@@ -87,7 +51,7 @@ export default function SettingsWindow() {
                 </DialogHeader>
                 <form onSubmit={(e) => onSettingsSubmit(e)} className='flex flex-col space-y-3'>
                     {
-                        notFound === true ?
+                        settingsContext?.notFound === true ?
                             <Alert className="text-sm mb-5 space-x-1 bg-pink-50 border-2 border-pink-200" variant={"default"}>
                                 <ThumbsDownIcon />
                                 <AlertTitle>Could not find the settings</AlertTitle>
@@ -99,7 +63,7 @@ export default function SettingsWindow() {
                     <div className="group flex flex-col space-y-1">
                         <Label htmlFor='maxTrades'> Maximum trades limit per day :</Label>
                         <div className='flex flex-row items-center justify-between space-x-1'>
-                            <Input name="maxTrades" type='number' id='maxTrades' defaultValue={data?.maxTradesLimit} placeholder='Enter a number' />
+                            <Input name="maxTrades" type='number' id='maxTrades' defaultValue={settingsContext?.data?.maxTradesLimit} placeholder='Enter a number' />
                         </div>
                     </div>
 
@@ -116,16 +80,16 @@ export default function SettingsWindow() {
                                 </Alert>
                             </span>
                         </Label>
-                        <Switch name="maxTradesWarning" defaultChecked={data?.warnWhenMaxLimitReached} id='maxTradesWarning' />
+                        <Switch name="maxTradesWarning" defaultChecked={settingsContext?.data?.warnWhenMaxLimitReached} id='maxTradesWarning' />
                     </div>
 
                     <div className="group flex flex-col space-y-1 mt-10">
                         <Label htmlFor='date'>Set tracking date :</Label>
                         <div className='flex flex-row items-center justify-between space-x-1'>
-                            <Input name="date" type='date' id='date' defaultValue={data?.trackingDate} placeholder='Enter a number' />
+                            <Input name="date" type='date' id='date' defaultValue={settingsContext?.data?.trackingDate} placeholder='Enter a number' />
                         </div>
                     </div>
-                    <Button type="submit" variant={"default"} >{notFound === true ? "Save" : "Update"}</Button>
+                    <Button type="submit" variant={"default"} >{settingsContext?.notFound === true ? "Save" : "Update"}</Button>
                 </form>
 
             </DialogContent>

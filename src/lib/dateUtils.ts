@@ -9,7 +9,7 @@ export function getTimeIn12HrFormat(date: Date) {
     if (date === null || date === undefined)
         return ""
 
-    return "" + date.getHours() + " : " + date.getMinutes() + " " + (date.getHours() >= 12 ? "PM" : "AM")
+    return format(date, "HH:mm a");
 }
 
 export function getFullDateTime(date: Date) {

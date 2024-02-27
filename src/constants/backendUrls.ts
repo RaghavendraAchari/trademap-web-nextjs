@@ -13,7 +13,7 @@ const uploadContentImage = allInsights + "/uploadContentImage"
 
 const settings = baseUrl + "/settings" 
 
-
+const analytics = baseUrl + "/analytics"
 
 export default {
     baseUrl: baseUrl,
@@ -32,7 +32,8 @@ export default {
         allInsightsWithTitlesOny,
         uploadContentImage
     },
-    settings: settings
+    settings: settings,
+    analytics: analytics
 }
 
 function getImageDownloadablePath(path: string) {

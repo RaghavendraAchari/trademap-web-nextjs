@@ -1,5 +1,4 @@
 "use client"
-
 import { Separator } from "@/components/ui/separator";
 import TradeDetailsForm from "../tradeDetails/TadeDetailsForm";
 import { Badge } from "@/components/ui/badge"
@@ -8,9 +7,11 @@ import Loading from "@/app/loading";
 import NoTradingDayForm from "../tradeDetails/NoTradingDayForm";
 import TradeDetailsList from "../tradeDetails/TradeDetailsList";
 import { Alert, AlertTitle, AlertDescription } from "../ui/alert";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { cn } from "@/lib/utils";
-import { Terminal } from "lucide-react";
+import { CircleOffIcon, Terminal } from "lucide-react";
+import { SettingsContext } from "@/context/SettingsContext";
+import TradesOfTheDay from "./TradesOfTheDay";
 
 
 interface props extends React.HTMLAttributes<HTMLDivElement> {
@@ -24,6 +25,7 @@ interface props extends React.HTMLAttributes<HTMLDivElement> {
 
 export default function TradesDetails({ trades, error, loading, forDate, setForDate, onDataSubmit, className, ...props }: props) {
     const [today] = useState<Date>(new Date())
+    const settingsContext = useContext(SettingsContext);
 
     return <div data-tradedetails className={cn(className)} {...props}>
         <div className="flex flex-row justify-between align-center mb-2 flex-none">
@@ -54,10 +56,16 @@ export default function TradesDetails({ trades, error, loading, forDate, setForD
                     : null
             }
 
-            {!loading && trades && trades.length > 0 ?
-                <DisplayTrades trades={trades} forDate={forDate} onDataSubmit={onDataSubmit} />
-                : null}
-            {!loading && error ? <TradeDetailsError /> : null}
+            {
+                !loading && trades && trades.length > 0
+                    ? <TradesOfTheDay maxTradeLimit={settingsContext.data?.maxTradesLimit} trades={trades} forDate={forDate} onDataSubmit={onDataSubmit} />
+                    : null
+            }
+            {
+                !loading && error
+                    ? <TradeDetailsError />
+                    : null
+            }
         </div>
 
 
@@ -89,14 +97,7 @@ function TotalPnL({ trades }: { trades: Trade[] }) {
     </span>
 }
 
-function DisplayTrades({ trades, forDate, onDataSubmit }: { trades: Trade[], forDate: Date, onDataSubmit: () => void }) {
-    if (trades[0].isHoliday === true || trades[0].noTradingDay == true || trades[0].isWeekend == true)
-        return <NoTradeDay trade={trades[0]} />
-    else return <>
-        <TradeDetailsList tradesList={trades} showFullDate={false} showOptions={true} />
-        <TradeDetailsForm forDate={forDate} onDataSubmit={onDataSubmit} />
-    </>
-}
+
 
 function NoTradesBanner() {
     return <div className="flex flex-col items-center p-2">
@@ -105,29 +106,7 @@ function NoTradesBanner() {
     </div>
 }
 
-function NoTradeDay({ trade }: { trade: Trade }) {
-    let title;
-    let imgSrc;
 
-    if (trade.isHoliday) {
-        title = "You marked it as a holiday."
-        imgSrc = "/holiday.svg"
-    }
-    else if (trade.noTradingDay) {
-        title = "You marked it as No Trading Day"
-        imgSrc = "/No Trading Day.svg"
-    }
-    else if (trade.isWeekend) {
-        title = "You marked it as weekend."
-        imgSrc = "/weekend.svg"
-    }
-
-
-    return <div className="flex flex-col justify-center">
-        <img src={imgSrc} alt="svg" className="object-contain w-72 h-64 mx-auto my-5 opacity-70" />
-        <p className="text-center font-medium text-md mt-2">{title}</p>
-    </div>
-}
 
 export function InstrumentTypeLogo({ type }: { type: string }) {
     let ob = null;

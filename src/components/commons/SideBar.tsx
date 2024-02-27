@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import tabs from '@/constants/tabNames';
 import SettingsWindow from '../settingsWindow/SettingsWindow';
+import SettingsContextProvider from '@/context/SettingsContext';
 
 
 
@@ -28,8 +29,9 @@ export default function SideBar() {
                     })
                 }
             </ul>
-
+            <SettingsContextProvider>
             <SettingsWindow />
+            </SettingsContextProvider>
         </nav>
     </header>
 }

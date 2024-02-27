@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import Insight from "../../models/insights/Insight.model";
 import axios, { AxiosError } from "axios";
-import backendUrls from "@/constants/backendUrls";
-
 
 export default function useFetchInsights(url: string) {
     const [list, setList] = useState<Insight[] | null>(null);

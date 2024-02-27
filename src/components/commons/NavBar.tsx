@@ -18,6 +18,7 @@ import { Separator } from "../ui/separator";
 import tabs from "@/constants/tabNames";
 import { useRef, useState } from "react";
 import SettingsWindow from "../settingsWindow/SettingsWindow";
+import SettingsContextProvider from "@/context/SettingsContext";
 
 // import appIcon from "@/assets/app-icon.svg"
 // import menuIcon from "@/assets/menu.svg"
@@ -55,7 +56,8 @@ export default function Navbar({ className }: Props) {
                         </ul>
                     </div>
                 <SheetFooter className="mt-10">
-                    <SettingsWindow />
+                    <SettingsContextProvider><SettingsWindow /></SettingsContextProvider>
+
                 </SheetFooter>
             </SheetContent>
         </Sheet>

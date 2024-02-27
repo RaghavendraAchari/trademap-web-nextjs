@@ -3,7 +3,7 @@
 import NoteWithTimeline from "@/components/commons/NoteCardWithTimeline";
 import Note from "@/models/notes/Note";
 import { useState } from "react";
-import NotesFilter from "../../components/notes/NotesFilter";
+import NotesInfo from "../../components/notes/NotesFilter";
 import EditNote from "../../components/notes/EditNote";
 import Loading from "../loading";
 import { SortByDate } from "@/components/commons/SortByDate";
@@ -24,6 +24,7 @@ import {
 import { Button } from "@/components/ui/button";
 import axios from "axios";
 import { useToast } from "@/components/ui/use-toast";
+import { InfoIcon } from "lucide-react";
 
 
 interface Filters {
@@ -89,31 +90,36 @@ export default function AllTrades() {
 
         <div className="hidden md:flex grow md:flex-col md:overflow-y-auto max-h-full md:w-[30%] mx-auto px-2 py-2 divide-y">
             <div className="flex-none bg-background text-foreground flex justify-between z-20 py-2">
-                <h3 className="font-bold">Filters:</h3>
+                <h3 className="font-bold flex">Info: <InfoIcon className="m-auto ml-2" size={16} /></h3>
             </div>
             <div className="grow max-h-full overflow-y-auto">
-                <NotesFilter className="grow max-h-full border-0" />
+                <NotesInfo className="grow max-h-full border-0" />
             </div>
         </div>
 
-        <div className="block md:hidden sticky bottom-0 bg-background">
-            <Drawer >
-                <DrawerTrigger className="p-2 font-semibold border w-full text-start">Filters: </DrawerTrigger>
-                <DrawerContent>
-                    <DrawerHeader>
-                        <DrawerTitle>Filters</DrawerTitle>
-                        <DrawerDescription>Filter based on tags, categories and search keywords</DrawerDescription>
-                    </DrawerHeader>
-                    <NotesFilter className="border-0" />
-                    <DrawerFooter>
-                        <Button>Apply</Button>
-                        <DrawerClose>
-                            <Button variant="outline">Cancel</Button>
-                        </DrawerClose>
-                    </DrawerFooter>
-                </DrawerContent>
-            </Drawer>
-        </div>
+        <NotesInfoMobileDrawer />
 
+
+    </div>
+}
+
+function NotesInfoMobileDrawer() {
+    return <div className="block md:hidden sticky bottom-0 bg-background">
+        <Drawer >
+            <DrawerTrigger className="p-2 font-semibold border w-full text-start">Info: <InfoIcon /> </DrawerTrigger>
+            <DrawerContent>
+                <DrawerHeader>
+                    <DrawerTitle>Information</DrawerTitle>
+                    <DrawerDescription>A brief information on 'Personal Notes'</DrawerDescription>
+                </DrawerHeader>
+                <NotesInfo className="border-0" />
+                <DrawerFooter>
+
+                    <DrawerClose>
+                        <Button variant="outline">Close</Button>
+                    </DrawerClose>
+                </DrawerFooter>
+            </DrawerContent>
+        </Drawer>
     </div>
 }

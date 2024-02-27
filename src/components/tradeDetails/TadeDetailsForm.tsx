@@ -20,12 +20,15 @@ import {
     DialogTitle,
     DialogTrigger,
 } from "@/components/ui/dialog"
-import React, { ChangeEvent, FormEvent, ReactElement, useEffect, useRef, useState } from "react"
+import React, { ChangeEvent, FormEvent, ReactElement, useContext, useEffect, useRef, useState } from "react"
 import useFetch from "../../hooks/useFetch"
 import SetupsAndInstruments from "@/models/trade/SetupsAndInstruments"
 import backendUrls from "@/constants/backendUrls"
 
 import { ScrollArea } from "@/components/ui/scroll-area"
+import { SettingsContext } from "@/context/SettingsContext";
+import { Popover } from "../ui/popover";
+import { PopoverContent } from "@radix-ui/react-popover";
 
 
 function getDateInISOAsLocalDate(date: Date): string {
@@ -35,21 +38,26 @@ function getDateInISOAsLocalDate(date: Date): string {
 interface Props {
     forDate: Date;
     onDataSubmit: () => void;
+    disabled?: boolean
 }
 
-export default function TradeDetailsForm({ forDate, onDataSubmit }: Props) {
-
+export default function TradeDetailsForm({ forDate, onDataSubmit, disabled }: Props) {
     const { data: setupsAndInstruments, error, loading, refresh } = useFetch<SetupsAndInstruments>(backendUrls.tradeDetails.setupsAndInstuments);
 
     const [formOpen, setFormOpen] = useState<boolean>(false)
-    const [sendingForm, setSendingForm] = useState<boolean>(false)
 
     const formState = useRef<HTMLFormElement | null>(null)
     const { toast } = useToast()
     const [fetchingData, setFetchingData] = useState(true)
     const [day, setDay] = useState<null | number>(null)
     const [maxDay, setMaxDay] = useState<null | number>(null)
+    const inputImagesRef = useRef<HTMLInputElement>(null);
 
+    const setupInpurRef = useRef<HTMLInputElement>(null)
+    const instrumentNameInpurRef = useRef<HTMLInputElement>(null)
+
+
+    const [sendingForm, setSendingForm] = useState<boolean>(false)
     const [formValues, setFormValues] = useState({
         "day": "",
         "dateTime": "",
@@ -184,11 +192,10 @@ export default function TradeDetailsForm({ forDate, onDataSubmit }: Props) {
         fileList.items.add(e.clipboardData.files[0])
 
         input.files = fileList.files;
-        // input.dispatchEvent(new Event("input", { bubbles: true }));
+
         setImagePreview()
     }
 
-    const inputImagesRef = useRef<HTMLInputElement>(null);
 
     function setImagePreview() {
         let previews: ReactElement[] = [];
@@ -206,19 +213,19 @@ export default function TradeDetailsForm({ forDate, onDataSubmit }: Props) {
                         key: i
                     })
                     previews.push(image);
+
+                    setImagePreviews(lastData => [...previews])
                 }
 
             }
 
         }
-
-        setImagePreviews(previews)
     }
 
     return <div className="flex w-full justify-center p-2">
         <Dialog open={formOpen} onOpenChange={setFormOpen}>
             <DialogTrigger asChild >
-                <Button className="justify-self-center w-fit " variant={"outline"}>+ Add new trade details</Button>
+                <Button disabled={disabled} className="justify-self-center w-fit " variant={"outline"}>+ Add new trade details</Button>
             </DialogTrigger>
         <DialogContent>
             <DialogHeader>
@@ -229,8 +236,10 @@ export default function TradeDetailsForm({ forDate, onDataSubmit }: Props) {
             </DialogHeader>
 
             <Separator />
+                {
 
-                <form ref={formState} onPaste={(e) => handleOnImagePaste(e)} onSubmit={(e) => handleSubmit(e)}>
+                }
+                <form ref={formState} onPaste={(e) => handleOnImagePaste(e)} onSubmit={(e) => handleSubmit(e)} onReset={() => setImagePreviews([])}>
                 <ScrollArea className="h-[500px]">
                     <div className="grid w-full max-w-sm items-center gap-4 p-2">
                             <Label aria-label="max-day" className="text-sm text-slate-500">Max days traded: {maxDay ? maxDay : 0}</Label>
@@ -266,12 +275,36 @@ export default function TradeDetailsForm({ forDate, onDataSubmit }: Props) {
 
                         <div className="label-distance">
                             <Label htmlFor="instrumentName">Instrument Name: </Label>
-                            <Input type="text" name="instrumentName" id="instrumentName" placeholder="Instrument Name" required />
+                                <Input ref={instrumentNameInpurRef} type="text" name="instrumentName" id="instrumentName" placeholder="Instrument Name" required />
+                                <ScrollArea className="text-sm flex flex-col h-52 border rounded">
+                                    {
+                                        !loading && setupsAndInstruments
+                                            ? setupsAndInstruments.instrumentNames.map(it => {
+                                                return <div className="p-2 mb-1 cursor-pointer hover:bg-slate-100" key={it} onClick={() => {
+                                                    if (instrumentNameInpurRef.current)
+                                                        instrumentNameInpurRef.current.value = it
+                                                }}>{it}</div>
+                                            })
+                                            : null
+                                    }
+                                </ScrollArea>
                         </div>
 
                         <div className="label-distance">
                             <Label htmlFor="setupName">Setup Name: </Label>
-                            <Input type="text" name="setupName" id="setupName" placeholder="Setup Name" required />
+                                <Input ref={setupInpurRef} type="text" name="setupName" id="setupName" placeholder="Setup Name" required />
+                                <ScrollArea className="text-sm flex flex-col h-52 border rounded">
+                                    {
+                                        !loading && setupsAndInstruments
+                                            ? setupsAndInstruments?.setupNames.map(it => {
+                                                return <div className="p-2  mb-1 cursor-pointer hover:bg-slate-100" key={it} onClick={() => {
+                                                    if (setupInpurRef.current)
+                                                        setupInpurRef.current.value = it
+                                                }}>{it}</div>
+                                            })
+                                            : null
+                                    }
+                                </ScrollArea>
                         </div>
 
                         <div className="label-distance">
@@ -322,12 +355,22 @@ export default function TradeDetailsForm({ forDate, onDataSubmit }: Props) {
 
                         <div className="label-distance">
                             <Label htmlFor="images">Images: </Label>
-                                <Input ref={inputImagesRef} onChange={() => setImagePreview()} id="images" name="images" type="file" multiple={true} accept="image/png, image/gif, image/jpeg" />
+                                <Input
+                                    ref={inputImagesRef}
+                                    onChange={() => setImagePreview()}
+                                    id="images"
+                                    name="images"
+                                    type="file"
+                                    multiple={true}
+                                    accept="image/png, image/gif, image/jpeg"
+                                />
                         </div>
 
-                        <div className="label-distance" id="imagePreview">
+                            <div className="label-distance" id="imagePreview">
                                 {
-                                    imagePreviews
+                                    imagePreviews.map((it, index) => {
+                                        return <div className="w-full" key={index}>{it}</div>
+                                    })
                                 }
                         </div>
                     </div>
