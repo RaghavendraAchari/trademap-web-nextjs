@@ -5,6 +5,7 @@ export default interface Analytics {
     totalWeekends: number
     totalNoTradingDays: number
     totalHolidays: number
+    totalTradedDays: number
     totalTrades: number
     totalTradesInStock: number
     totalTradesInIndex: number
@@ -16,4 +17,7 @@ export default interface Analytics {
     dateOfMaxLoss: string
     noOfProfitTrades: number
     noOfLossTrades: number
+    profitMakingDays: number
+    lossMakingDays: number
+    dateWiseProfit: { date: string, pnl: number }[]
 }

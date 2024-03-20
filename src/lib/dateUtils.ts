@@ -19,3 +19,7 @@ export function getFullDateTime(date: Date) {
 export function getFullDateTimeWithMinutes(date: Date) {
     return format(date, "dd MMM yyyy - HH:mm:ss a");
 }
+
+export function appendTime(date: Date): string {
+    return format(date, "yyyy-MM-dd") + "T" + format(date, "hh:mm")
+}

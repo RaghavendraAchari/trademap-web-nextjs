@@ -1,11 +1,12 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import Analytics from "@/models/analytics/analytics";
 import { ArrowDownIcon, ArrowRightIcon } from "lucide-react";
 
 const cardStyle = "border-2 w-full hover:bg-slate-50 shadow-none cursor-pointer";
 const cardHeaderStyle = "text-xl"
 const cardValuesStyle = "text-lg font-semibold"
 
-export default function TradedSegmentsDetails() {
+export default function TradedSegmentsDetails({ data: { totalTrades, totalTradesInStock, totalTradesInIndex, totalTradesInCommodity } }: { data: Analytics }) {
     return <Card className="border-0 bg-violet-50 mt-10" >
 
         <CardHeader>
@@ -19,14 +20,14 @@ export default function TradedSegmentsDetails() {
                             <span className="block md:hidden"><ArrowDownIcon /></span>
                         </CardDescription>
                     </CardHeader>
-                    <CardFooter className="text-4xl">100 Trades</CardFooter>
+                    <CardFooter className="text-4xl">{totalTrades} Trades</CardFooter>
                 </Card>
                 <Card className={cardStyle + " "}>
                     <CardHeader className="h-full" >
                         <div><img className="h-20" src="/stock.svg" alt="Stock icon" /></div>
                         <div className="flex flex-col h-full  justify-between">
                             <CardTitle className={cardHeaderStyle}>Trades taken in <br /> stocks</CardTitle>
-                            <CardDescription className={cardValuesStyle}>20</CardDescription>
+                            <CardDescription className={cardValuesStyle}>{totalTradesInStock}</CardDescription>
                         </div>
                     </CardHeader>
                 </Card>
@@ -35,7 +36,7 @@ export default function TradedSegmentsDetails() {
                         <div><img className="h-20" src="/fno.svg" alt="fno icon" /></div>
                         <div className="flex flex-col h-full  justify-between">
                             <CardTitle className={cardHeaderStyle}>Trades taken in <br /> FnO</CardTitle>
-                            <CardDescription className={cardValuesStyle}>20</CardDescription>
+                            <CardDescription className={cardValuesStyle}>{totalTradesInIndex}</CardDescription>
                         </div>
                     </CardHeader>
                 </Card>
@@ -44,7 +45,7 @@ export default function TradedSegmentsDetails() {
                         <div><img className="h-20" src="/commodity.svg" alt="commodity icon" /></div>
                         <div className="flex flex-col items-stretch h-full justify-between">
                             <CardTitle className={cardHeaderStyle}>Trades taken in <br /> commodity</CardTitle>
-                            <CardDescription className={cardValuesStyle}>20</CardDescription>
+                            <CardDescription className={cardValuesStyle}>{totalTradesInCommodity}</CardDescription>
                         </div>
                     </CardHeader>
                 </Card>

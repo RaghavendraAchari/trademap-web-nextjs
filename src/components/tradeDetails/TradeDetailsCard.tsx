@@ -17,6 +17,8 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import TradeRemarksEdit from "./tradeRemarksEdit";
+import { Dialog } from "../ui/dialog";
 
 
 interface Props {
@@ -60,9 +62,9 @@ export default function TradeDetailsCard({ trade, showFullDate, showOptions = fa
                     {showOptions && <div>
                         <DropdownMenu >
                             <DropdownMenuTrigger asChild className="cursor-pointer ml-1 "><Button size={"icon"} variant={"ghost"}><MoreVertical size={16} /></Button></DropdownMenuTrigger>
+
                             <DropdownMenuContent align="end" className="text-xs">
-                                <DropdownMenuItem className="space-x-1 cursor-pointer text-sm" ><Edit2 size={16} /><span>Edit</span></DropdownMenuItem>
-                                <DropdownMenuItem className="space-x-1 cursor-pointer text-sm"><Trash2 size={16} /><span>Delete</span></DropdownMenuItem>
+                                <TradeRemarksEdit trade={trade} />
                             </DropdownMenuContent>
                         </DropdownMenu>
                     </div>}

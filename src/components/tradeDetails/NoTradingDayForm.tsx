@@ -1,12 +1,13 @@
 
 import { FormEvent, useState } from "react"
 import { Button } from "../ui/button"
-import { getDateInISOAsLocalDate } from "@/lib/dateUtils"
+import { appendTime, getDateInISOAsLocalDate } from "@/lib/dateUtils"
 import axios, { AxiosError } from "axios"
 import { useToast } from "../ui/use-toast"
 import { Checkbox } from "../ui/checkbox"
 import useRefreshEvent from "../../hooks/useRefreshEvent"
 import Loader from "../commons/LoadingSpinner"
+import { Textarea } from "../ui/textarea"
 
 
 interface Props {
@@ -32,16 +33,19 @@ export default function NoTradingDayForm({ forDate, onDataSubmit }: Props) {
     const [state, setState] = useState<State>(null)
     const { toast } = useToast()
     const [submiting, setSubmitig] = useState(false);
+    const [remarks, setRemarks] = useState<string>("")
 
-    const handleSubmit = (e: FormEvent) => {
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        if (state === null) return;
 
         const postData: Data = {
             isHoliday: state === "Holiday",
             isWeekend: state === "Weekend",
             noTradingDay: state === "NoTradingDay",
-            dateTime: getDateInISOAsLocalDate(forDate),
-            remarks: ""
+            dateTime: appendTime(forDate),
+            remarks: remarks
         }
         setSubmitig(true)
 
@@ -67,6 +71,8 @@ export default function NoTradingDayForm({ forDate, onDataSubmit }: Props) {
                 })
 
                 setSubmitig(false);
+                setRemarks("")
+                setState(null)
                 onDataSubmit();
 
             })
@@ -75,9 +81,10 @@ export default function NoTradingDayForm({ forDate, onDataSubmit }: Props) {
             });
     }
 
-    return <form className="space-y-1 flex flex-col md:flex-row md:space-y-0  md:justify-between md:items-center" onSubmit={(e) => { handleSubmit(e) }}>
+    return <>
+        <form className="mt-4 space-y-1 flex flex-col md:flex-row md:space-y-0 p-2 bg-slate-100 rounded border md:justify-between md:items-center" onSubmit={(e) => { handleSubmit(e) }}>
         <div className="items-top flex space-x-2">
-            <Checkbox name="noTradingDay" id="noTradingDay" checked={state === "NoTradingDay"} onClick={() => {
+                <Checkbox className="bg-white" name="noTradingDay" id="noTradingDay" checked={state === "NoTradingDay"} onClick={() => {
                 setState(prev => prev === "NoTradingDay" ? null : "NoTradingDay")
             }} />
             <label
@@ -88,7 +95,7 @@ export default function NoTradingDayForm({ forDate, onDataSubmit }: Props) {
             </label>
         </div>
         <div className="items-top flex space-x-2">
-            <Checkbox name="isHoliday" id="isHoliday" checked={state === "Holiday"} onClick={() => {
+                <Checkbox className="bg-white" name="isHoliday" id="isHoliday" checked={state === "Holiday"} onClick={() => {
                 setState(prev => prev === "Holiday" ? null : "Holiday")
 
             }} />
@@ -100,7 +107,7 @@ export default function NoTradingDayForm({ forDate, onDataSubmit }: Props) {
             </label>
         </div>
         <div className="items-top flex space-x-2">
-            <Checkbox name="isWeekend" id="isWeekend" checked={state === "Weekend"} onClick={() => {
+                <Checkbox className="bg-white" name="isWeekend" id="isWeekend" checked={state === "Weekend"} onClick={() => {
                 setState(prev => prev === "Weekend" ? null : "Weekend")
             }} />
             <label
@@ -112,4 +119,10 @@ export default function NoTradingDayForm({ forDate, onDataSubmit }: Props) {
         </div>
         <Button className="mr-0 self-end" type="submit" variant={"outline"}>{submiting ? <Loader loading={submiting} /> : "Update"}</Button>
     </form>
+        {
+            state === "Holiday" || state === "NoTradingDay"
+                ? <Textarea className="mt-2" onChange={(e) => setRemarks(e.target.value)} value={remarks} rows={3} placeholder="Remarks if any..."></Textarea>
+                : null
+        }
+    </>
 }

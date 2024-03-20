@@ -17,7 +17,7 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 
-export default function TopicsView({ data, onDataSubmit, onItemClick }: { data: Insight[] | null, onDataSubmit: () => void, onItemClick: (item: Insight) => void }) {
+export default function TopicsView({ data, onDataSubmit, onItemClick, selectedItem }: { data: Insight[] | null, onDataSubmit: () => void, onItemClick: (item: Insight) => void, selectedItem?: Insight }) {
 
     const [title, setTitle] = useState("")
     const [insightType, setInsightType] = useState<InsightType>("INSIGHT")
@@ -87,10 +87,10 @@ export default function TopicsView({ data, onDataSubmit, onItemClick }: { data: 
                 <AlertDescription>Add an insight first</AlertDescription>
             </Alert> : <div >
                 <h3 className="p-2 font-semibold border-b mb-1">Setups</h3>
-                <TopicsList data={insights} onItemClick={onItemClick} />
+                    <TopicsList data={insights} onItemClick={onItemClick} selectedItem={selectedItem} />
 
                 <h3 className="mt-10 p-2 font-semibold border-b mb-1">Case Studies</h3>
-                <TopicsList data={caseStudies} onItemClick={onItemClick} />
+                    <TopicsList data={caseStudies} onItemClick={onItemClick} selectedItem={selectedItem} />
             </div>}
 
         </div>

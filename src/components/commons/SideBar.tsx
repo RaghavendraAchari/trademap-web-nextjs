@@ -5,11 +5,15 @@ import Link from 'next/link'
 import tabs from '@/constants/tabNames';
 import SettingsWindow from '../settingsWindow/SettingsWindow';
 import SettingsContextProvider from '@/context/SettingsContext';
+import useUserLogin from '@/hooks/useUserLogin';
+import { Button } from 'react-day-picker';
+import { GoogleLoginComponent } from './GoogleLogin';
 
 
 
 export default function SideBar() {
     const pathname = usePathname();
+    const userLoggedin = useUserLogin();
 
     return <header className='mx-auto bg-main py-4 text-center flex flex-col justify-start text-white h-full space-y-2'>
         <div className='flex flex-col space-y-3'>
@@ -29,9 +33,13 @@ export default function SideBar() {
                     })
                 }
             </ul>
-            <SettingsContextProvider>
-            <SettingsWindow />
-            </SettingsContextProvider>
+            {
+                userLoggedin
+                    ? <SettingsContextProvider>
+                        <SettingsWindow />
+                    </SettingsContextProvider>
+                    : <GoogleLoginComponent />
+            }
         </nav>
     </header>
 }

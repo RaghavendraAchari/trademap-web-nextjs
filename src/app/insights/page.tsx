@@ -35,7 +35,7 @@ export default function Insights() {
                             data={data}
                             onDataSubmit={refresh}
                             onItemClick={(item: Insight) => { setSelectedItem(item); setContentEdit(false); setOpenDrawer(true) }}
-
+                            selectedItem={selectedItem}
                         />
                         : null
                 }

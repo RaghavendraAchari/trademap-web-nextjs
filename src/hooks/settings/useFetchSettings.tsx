@@ -1,6 +1,8 @@
 import axios, { AxiosError } from "axios";
 import { useEffect, useState } from "react";
 import Settings from "@/models/settings/settings.model";
+import http from "../axiosConfig";
+
 
 
 export default function useFetchSettings(url: string) {
@@ -16,7 +18,7 @@ export default function useFetchSettings(url: string) {
     function fetchData(url: string) {
         setLoading(true)
 
-        axios.get(url)
+        http.get(url)
             .then(res => {
                 setData(res.data)
                 setError(null)

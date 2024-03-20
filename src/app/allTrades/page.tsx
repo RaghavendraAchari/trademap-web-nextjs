@@ -2,7 +2,7 @@
 
 import TradeDetailsList from "@/components/tradeDetails/TradeDetailsList";
 import { useToast } from "@/components/ui/use-toast";
-import { useState } from "react";
+import { Dispatch, HTMLAttributes, SetStateAction, useState } from "react";
 import Loading from "../loading";
 import { DotIcon, Edit2, MoreVertical, Terminal, Trash2 } from "lucide-react";
 import { SORT } from "@/constants/SortType";
@@ -14,9 +14,10 @@ import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMe
 import { Button } from "@/components/ui/button";
 import TradeFilters from "@/types/filters";
 import { Checkbox } from "@/components/ui/checkbox";
-import { CheckboxItem } from "@radix-ui/react-dropdown-menu";
 import { Label } from "@/components/ui/label";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
+import { Separator } from "@/components/ui/separator";
 
 export default function AllTrades() {
     const [pageNumber, setPageNumber] = useState(0)
@@ -27,6 +28,11 @@ export default function AllTrades() {
         showHoliday: true,
         showNoTradingDay: true,
         showWeekend: true,
+        instrumentType: {
+            index: true,
+            stock: true,
+            commodity: true,
+        }
     })
     console.log(filters);
 
@@ -96,55 +102,8 @@ export default function AllTrades() {
                                 <TradeDetailsList tradesList={trades} showFullDate={true} />
                                 <DotIcon className="self-center mx-auto opacity-50 w-10 h-10" />
                             </ScrollArea>
-                            <div className="col-span-2 p-2 max-h-full overflow-auto md:block hidden">
-                                <h3 className="font-medium text-muted-foreground border-b px-2 py-1">Filters:</h3>
-                                <div className="flex space-x-1 items-center p-2">
-                                    <Checkbox
-                                        id="holiday"
-                                        name="holiday"
-                                        checked={filters.showHoliday}
-                                        onCheckedChange={(checked: boolean) => {
-                                            console.log(checked);
 
-                                            setFilters(state => {
-                                                return { ...state, showHoliday: checked }
-                                            })
-
-                                        }}
-                                    />
-                                    <Label className="cursor-pointer" htmlFor="holiday">Show holiday</Label>
-                                </div>
-                                <div className="flex space-x-1 items-center p-2">
-                                    <Checkbox
-                                        id="notradingday"
-                                        name="notradingday"
-                                        checked={filters.showNoTradingDay}
-                                        onCheckedChange={(checked: boolean) => {
-                                            console.log(checked);
-                                            setFilters(state => {
-                                                return { ...state, showNoTradingDay: checked }
-                                            })
-                                        }}
-                                    />
-                                    <Label className="cursor-pointer" htmlFor="notradingday">Show no trading day</Label>
-                                </div>
-                                <div className="flex space-x-1 items-center p-2">
-                                    <Checkbox
-                                        id="weekend"
-                                        name="weekend"
-                                        checked={filters.showWeekend}
-                                        onCheckedChange={(checked: boolean) => {
-                                            console.log(checked);
-                                            debugger
-                                            setFilters(state => {
-                                                return { ...state, showWeekend: checked }
-                                            })
-                                        }}
-                                    />
-                                    <Label className="cursor-pointer" htmlFor="weekend">Show weekends</Label>
-                                </div>
-
-                            </div>
+                            <TradeFiltersWindow filters={filters} setFilters={setFilters} />
                         </div>
                         : null
                 }
@@ -160,4 +119,119 @@ export default function AllTrades() {
     )
 }
 
+interface TradeFiltersWindowProps extends HTMLAttributes<HTMLDivElement> {
+    filters: TradeFilters,
+    setFilters: Dispatch<SetStateAction<TradeFilters>>
+}
 
+function TradeFiltersWindow({ filters: state, setFilters: setFilterState, className }: TradeFiltersWindowProps) {
+    const [filters, setFilters] = useState<TradeFilters>(state);
+
+    let showOnlyTrades = filters.showWeekend === false && filters.showHoliday === false && filters.showWeekend === false;
+
+    return <div className={cn("col-span-2 p-2 max-h-full overflow-auto md:block hidden", className)}>
+        <h3 className="font-medium text-muted-foreground border-b px-2 py-1">Filters:</h3>
+        <div className="flex space-x-1 items-center p-2">
+            <Checkbox
+                id="holiday"
+                name="holiday"
+                checked={filters.showHoliday}
+                onCheckedChange={(checked: boolean) => {
+                    setFilters(state => {
+                        return { ...state, showHoliday: checked }
+                    })
+
+                }}
+            />
+            <Label className="cursor-pointer" htmlFor="holiday">Include holidays</Label>
+        </div>
+        <div className="flex space-x-1 items-center p-2">
+            <Checkbox
+                id="notradingday"
+                name="notradingday"
+                checked={filters.showNoTradingDay}
+                onCheckedChange={(checked: boolean) => {
+                    setFilters(state => {
+                        return { ...state, showNoTradingDay: checked }
+                    })
+                }}
+            />
+            <Label className="cursor-pointer" htmlFor="notradingday">Include no trading days</Label>
+        </div>
+        <div className="flex space-x-1 items-center p-2">
+            <Checkbox
+                id="weekend"
+                name="weekend"
+                checked={filters.showWeekend}
+                onCheckedChange={(checked: boolean) => {
+                    setFilters(state => {
+                        return { ...state, showWeekend: checked }
+                    })
+                }}
+            />
+            <Label className="cursor-pointer" htmlFor="weekend">Include weekends</Label>
+        </div>
+
+        <Separator />
+        <div className="flex space-x-1 items-center p-2">
+            <Checkbox
+                id="showOnlyTrades"
+                name="showOnlyTrades"
+                checked={showOnlyTrades}
+                onCheckedChange={(checked: boolean) => {
+                    setFilters((state) => {
+                        return { ...state, showWeekend: !checked, showHoliday: !checked, showNoTradingDay: !checked } as TradeFilters
+                    })
+                }}
+            />
+            <Label className="cursor-pointer" htmlFor="showOnlyTrades">Only show trades</Label>
+        </div>
+
+        <h3 className="text-md mt-4">Instrument Type:</h3>
+        <Separator />
+        <div className="flex space-x-1 items-center p-2">
+            <Checkbox
+                id="Stock"
+                name="Stock"
+                checked={filters.instrumentType.stock}
+                onCheckedChange={(checked: boolean) => {
+                    setFilters(state => {
+                        return { ...state, instrumentType: { ...state.instrumentType, stock: checked } }
+                    })
+                }}
+            />
+            <Label className="cursor-pointer" htmlFor="Stock">Stock</Label>
+        </div>
+
+        <div className="flex space-x-1 items-center p-2">
+            <Checkbox
+                id="Index"
+                name="Index"
+                checked={filters.instrumentType.index}
+                onCheckedChange={(checked: boolean) => {
+                    setFilters(state => {
+                        return { ...state, instrumentType: { ...state.instrumentType, index: checked } }
+                    })
+                }}
+            />
+            <Label className="cursor-pointer" htmlFor="Index">FnO</Label>
+        </div>
+        <div className="flex space-x-1 items-center p-2">
+            <Checkbox
+                id="commodity"
+                name="commodity"
+                checked={filters.instrumentType.commodity}
+                onCheckedChange={(checked: boolean) => {
+                    setFilters(state => {
+                        return { ...state, instrumentType: { ...state.instrumentType, commodity: checked } }
+                    })
+                }}
+            />
+            <Label className="cursor-pointer" htmlFor="commodity">Commodity</Label>
+        </div>
+        <div className="flex space-x-1 items-center justify-end p-2">
+            <Button variant={"outline"} size={"sm"} onClick={() => setFilterState(filters)}>Apply Filters</Button>
+        </div>
+
+    </div>
+}

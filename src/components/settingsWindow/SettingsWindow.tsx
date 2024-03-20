@@ -29,6 +29,7 @@ export default function SettingsWindow() {
             maxTradesLimit: formData.get("maxTrades"),
             warnWhenMaxLimitReached: formData.get("maxTradesWarning") === "on" ? true : false,
             trackingDate: formData.get("date"),
+            disableButton: formData.get("disableButton"),
         }
 
         settingsContext?.onSubmit(dataObject as SettingsModel);
@@ -81,6 +82,14 @@ export default function SettingsWindow() {
                             </span>
                         </Label>
                         <Switch name="maxTradesWarning" defaultChecked={settingsContext?.data?.warnWhenMaxLimitReached} id='maxTradesWarning' />
+                    </div>
+
+                    <div className="group flex items-start justify-between mt-10">
+                        <Label className='w-full flex flex-col space-y-1' htmlFor='disableButton'>
+                            <span>Disable the " + Add new trade" button when limit reached</span>
+                            <span className='text-xs text-slate-500'>You will not be able to add new trades when trade limit per day is reached</span>
+                        </Label>
+                        <Switch name="disableButton" defaultChecked={settingsContext?.data?.disableButton} id='disableButton' />
                     </div>
 
                     <div className="group flex flex-col space-y-1 mt-10">

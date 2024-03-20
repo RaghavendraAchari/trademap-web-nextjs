@@ -7,13 +7,16 @@ import {
     HoverCardContent,
     HoverCardTrigger,
 } from "@/components/ui/hover-card"
+import Analytics from "@/models/analytics/analytics";
+import currencyFormatter from "@/lib/currencyFormatter";
 
 
 const cardStyle = "border-2 w-full hover:bg-slate-50 shadow-none cursor-pointer";
 const cardHeaderStyle = "text-xl"
 const cardValuesStyle = "text-lg font-semibold"
 
-export default function PnlAnalytics() {
+
+export default function PnlAnalytics({ data: { totalPnl, maxProfitInADay, maxLossInADay, profitMakingDays, lossMakingDays } }: { data: Analytics }) {
     return <Card className="border-0 bg-slate-50 mt-10" >
 
         <CardHeader>
@@ -27,14 +30,17 @@ export default function PnlAnalytics() {
                             <span className="block md:hidden"><ArrowDownIcon /></span>
                         </CardDescription>
                     </CardHeader>
-                    <CardFooter className="text-4xl flex items-baseline">+ 12,000 <Rs /> <ChevronsUpIcon size={30} className="text-green-400 " /></CardFooter>
+                    <CardFooter className="text-4xl flex items-baseline">
+                        {totalPnl >= 0 ? "+" : null}{currencyFormatter.format(totalPnl)} <Rs />
+                        {totalPnl > 0 ? <ChevronsUpIcon size={30} className="text-green-400 " /> : <ChevronsDownIcon size={30} className="text-red-400 " />}
+                    </CardFooter>
                 </Card>
                 <Card className={cardStyle + " border-2 border-green-100"}>
                     <CardHeader className="h-full" >
                         <div><img className="h-20" src="/max-profit.svg" alt="Stock icon" /></div>
                         <div className="flex flex-col h-full  justify-between">
                             <CardTitle className={cardHeaderStyle}>Max profit in day</CardTitle>
-                            <CardDescription className={cardValuesStyle}>20</CardDescription>
+                            <CardDescription className={cardValuesStyle}>{currencyFormatter.format(maxProfitInADay)}</CardDescription>
                         </div>
                     </CardHeader>
                 </Card>
@@ -43,7 +49,7 @@ export default function PnlAnalytics() {
                         <div><img className="h-20" src="/max-loss.svg" alt="fno icon" /></div>
                         <div className="flex flex-col h-full justify-between">
                             <CardTitle className={cardHeaderStyle}>Max loss in day</CardTitle>
-                            <CardDescription className={cardValuesStyle}>20</CardDescription>
+                            <CardDescription className={cardValuesStyle}>{currencyFormatter.format(maxLossInADay)}</CardDescription>
                         </div>
                     </CardHeader>
                 </Card>
@@ -54,7 +60,7 @@ export default function PnlAnalytics() {
                             <div className="grow flex flex-col items-stretch h-full justify-between ">
                                 <CardTitle >
                                     <div className="w-full flex flex-row items-center justify-between text-xl">
-                                        <span>Profit making days</span><span>30</span>
+                                        <span>Profit making days</span><span>{profitMakingDays}</span>
                                     </div>
                                 </CardTitle>
                                 <CardDescription className="text-sm text-muted-foreground">Days when you made profits</CardDescription>
@@ -68,19 +74,23 @@ export default function PnlAnalytics() {
 
                                 <CardTitle >
                                     <div className="w-full flex flex-row items-center justify-between text-xl">
-                                        <span>Loss making days</span><span>30</span>
+                                        <span>Loss making days</span><span>{lossMakingDays}</span>
                                     </div>
                                 </CardTitle>
                                 <CardDescription className={"text-sm text-muted-foreground"}>Days when you made losses</CardDescription>
                             </div>
                         </CardHeader>
                     </Card>
-                    <HoverCard>
-                        <HoverCardTrigger className="w-full text-sm bg-green-100 p-2 rounded-md hover:cursor-pointer border-2 border-green-200">You need more work on risk management</HoverCardTrigger>
-                        <HoverCardContent className="text-sm" >
-                            Risk Management is the decision you take on tour risk capital. For example if a trade looks like a bad trade, you should either remove quantities or else completely exit the trade.
-                        </HoverCardContent>
-                    </HoverCard>
+                    {
+                        profitMakingDays < lossMakingDays
+                            ? <HoverCard>
+                                <HoverCardTrigger className="w-full text-sm bg-green-100 p-2 rounded-md hover:cursor-pointer border-2 border-green-200">You need more work on risk management</HoverCardTrigger>
+                                <HoverCardContent className="text-sm" >
+                                    Risk Management is the decision you take on tour risk capital. For example if a trade looks like a bad trade, you should either remove quantities or else completely exit the trade.
+                                </HoverCardContent>
+                            </HoverCard>
+                            : null
+                    }
                 </div>
 
 

@@ -1,6 +1,7 @@
 const baseUrl = "http://localhost:8080"
 
 const allTrades = baseUrl + "/tradedetails"
+const maxTradedDays = allTrades + "/getMaxDaysTraded"
 const pendingDays = allTrades + "/pendingDates"
 const setupsAndInstuments = allTrades + "/setupsAndInstuments"
 
@@ -21,7 +22,8 @@ export default {
         allTrades,
         pendingDays,
         setupsAndInstuments,
-        getImageDownloadablePath
+        getImageDownloadablePath,
+        maxTradedDays
     },
     notes: {
         allNotes,

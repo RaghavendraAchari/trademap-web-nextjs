@@ -19,9 +19,9 @@ import tabs from "@/constants/tabNames";
 import { useRef, useState } from "react";
 import SettingsWindow from "../settingsWindow/SettingsWindow";
 import SettingsContextProvider from "@/context/SettingsContext";
+import useUserLogin from "@/hooks/useUserLogin";
+import { GoogleLoginComponent } from "./GoogleLogin";
 
-// import appIcon from "@/assets/app-icon.svg"
-// import menuIcon from "@/assets/menu.svg"
 
 
 interface Props {
@@ -31,6 +31,7 @@ interface Props {
 
 export default function Navbar({ className }: Props) {
     const [open, setOpen] = useState(false);
+    const userLoggedin = useUserLogin();
 
     return <header className={className}>
         <div className="flex flex-row grow justify-start space-x-2 items-center">
@@ -56,7 +57,13 @@ export default function Navbar({ className }: Props) {
                         </ul>
                     </div>
                 <SheetFooter className="mt-10">
-                    <SettingsContextProvider><SettingsWindow /></SettingsContextProvider>
+                    {
+                        userLoggedin
+                            ? <SettingsContextProvider>
+                                <SettingsWindow />
+                            </SettingsContextProvider>
+                            : <GoogleLoginComponent />
+                    }
 
                 </SheetFooter>
             </SheetContent>
